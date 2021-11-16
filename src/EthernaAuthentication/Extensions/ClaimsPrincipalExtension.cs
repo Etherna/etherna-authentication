@@ -1,5 +1,4 @@
-﻿using Etherna.Authentication.Consts;
-using System;
+﻿using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Text.Json;
@@ -13,7 +12,7 @@ namespace Etherna.Authentication.Extensions
             if (user is null)
                 throw new ArgumentNullException(nameof(user));
 
-            return user.Claims.First(claim => claim.Type == DefaultClaimTypes.ClientId).Value;
+            return user.Claims.First(claim => claim.Type == ClaimTypes.ClientId).Value;
         }
 
         public static string GetEtherAddress(this ClaimsPrincipal user)
@@ -21,7 +20,7 @@ namespace Etherna.Authentication.Extensions
             if (user is null)
                 throw new ArgumentNullException(nameof(user));
 
-            var claim = user.Claims.First(claim => claim.Type == DefaultClaimTypes.EtherAddress);
+            var claim = user.Claims.First(claim => claim.Type == ClaimTypes.EtherAddress);
             return claim.Value;
         }
 
@@ -30,7 +29,7 @@ namespace Etherna.Authentication.Extensions
             if (user is null)
                 throw new ArgumentNullException(nameof(user));
 
-            var claim = user.Claims.First(claim => claim.Type == DefaultClaimTypes.EtherPreviousAddresses);
+            var claim = user.Claims.First(claim => claim.Type == ClaimTypes.EtherPreviousAddresses);
             return JsonSerializer.Deserialize<string[]>(claim.Value) ?? Array.Empty<string>();
         }
 
@@ -39,7 +38,7 @@ namespace Etherna.Authentication.Extensions
             if (user is null)
                 throw new ArgumentNullException(nameof(user));
 
-            var claim = user.Claims.First(claim => claim.Type == DefaultClaimTypes.Username);
+            var claim = user.Claims.First(claim => claim.Type == ClaimTypes.Username);
             return claim.Value;
         }
 
@@ -47,7 +46,7 @@ namespace Etherna.Authentication.Extensions
         {
             if (user is null) return null;
 
-            var claim = user.Claims.FirstOrDefault(claim => claim.Type == DefaultClaimTypes.ClientId);
+            var claim = user.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.ClientId);
             return claim?.Value;
         }
 
@@ -55,7 +54,7 @@ namespace Etherna.Authentication.Extensions
         {
             if (user is null) return null;
 
-            var claim = user.Claims.FirstOrDefault(claim => claim.Type == DefaultClaimTypes.EtherAddress);
+            var claim = user.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.EtherAddress);
             return claim?.Value;
         }
 
@@ -63,7 +62,7 @@ namespace Etherna.Authentication.Extensions
         {
             if (user is null) return null;
 
-            var claim = user.Claims.FirstOrDefault(claim => claim.Type == DefaultClaimTypes.EtherPreviousAddresses);
+            var claim = user.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.EtherPreviousAddresses);
             return claim is null ? null : JsonSerializer.Deserialize<string[]>(claim.Value);
         }
 
@@ -71,7 +70,7 @@ namespace Etherna.Authentication.Extensions
         {
             if (user is null) return null;
 
-            var claim = user.Claims.FirstOrDefault(claim => claim.Type == DefaultClaimTypes.Username);
+            var claim = user.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Username);
             return claim?.Value;
         }
     }
