@@ -21,7 +21,8 @@ namespace Etherna.Authentication.Extensions
             if (user is null)
                 throw new ArgumentNullException(nameof(user));
 
-            return user.Claims.First(claim => claim.Type == DefaultClaimTypes.EtherAddress).Value;
+            var claim = user.Claims.First(claim => claim.Type == DefaultClaimTypes.EtherAddress);
+            return claim.Value;
         }
 
         public static string[] GetEtherPrevAddresses(this ClaimsPrincipal user)
@@ -29,14 +30,17 @@ namespace Etherna.Authentication.Extensions
             if (user is null)
                 throw new ArgumentNullException(nameof(user));
 
-            var claim = user.Claims.First(claim => claim.Type == DefaultClaimTypes.EtherPreviousAddress);
-            return JsonSerializer.Deserialize<string[]>(claim.Value);
+            var claim = user.Claims.First(claim => claim.Type == DefaultClaimTypes.EtherPreviousAddresses);
+            return JsonSerializer.Deserialize<string[]>(claim.Value) ?? Array.Empty<string>();
         }
 
         public static string GetUsername(this ClaimsPrincipal user)
         {
-            //TODO
-            throw new NotImplementedException();
+            if (user is null)
+                throw new ArgumentNullException(nameof(user));
+
+            var claim = user.Claims.First(claim => claim.Type == DefaultClaimTypes.Username);
+            return claim.Value;
         }
 
         public static string? TryGetClientId(this ClaimsPrincipal user)
@@ -59,16 +63,16 @@ namespace Etherna.Authentication.Extensions
         {
             if (user is null) return null;
 
-            var claim = user.Claims.FirstOrDefault(claim => claim.Type == DefaultClaimTypes.EtherPreviousAddress);
+            var claim = user.Claims.FirstOrDefault(claim => claim.Type == DefaultClaimTypes.EtherPreviousAddresses);
             return claim is null ? null : JsonSerializer.Deserialize<string[]>(claim.Value);
         }
 
-#pragma warning disable IDE0060 // Remove unused parameter
         public static string? TryGetUsername(this ClaimsPrincipal user)
         {
-            //TODO
-            return null;
+            if (user is null) return null;
+
+            var claim = user.Claims.FirstOrDefault(claim => claim.Type == DefaultClaimTypes.Username);
+            return claim?.Value;
         }
-#pragma warning restore IDE0060 // Remove unused parameter
     }
 }
