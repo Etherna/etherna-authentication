@@ -112,29 +112,23 @@ namespace Etherna.Authentication
             if (claim is not null)
                 return claim;
 
-            var userInfo = await GetUserInfoAsync().ConfigureAwait(false);
+            var accessToken = await httpContext.GetTokenAsync("access_token").ConfigureAwait(false);
+            if (accessToken is null)
+                return null;
+
+            var userInfo = await GetUserInfoAsync(accessToken).ConfigureAwait(false);
             return userInfo.FirstOrDefault(c => c.Type == claimType);
         }
 
-        private async Task<IEnumerable<Claim>> GetUserInfoAsync()
+        private async Task<IEnumerable<Claim>> GetUserInfoAsync(string accessToken)
         {
             if (_userInfo is null)
             {
                 // Get discovery document.
                 var discoveryDoc = await discoveryDocumentService.GetDiscoveryDocumentAsync().ConfigureAwait(false);
 
-                // Get access token.
-                using var httpClient = new HttpClient();
-
-                var httpContext = httpContextAccessor.HttpContext;
-                if (httpContext is null)
-                    throw new InvalidOperationException("HttpContext can't be null");
-
-                var accessToken = await httpContext.GetTokenAsync("access_token").ConfigureAwait(false);
-                if (accessToken is null)
-                    throw new InvalidOperationException("access token can't be null");
-
                 // Get user info.
+                using var httpClient = new HttpClient();
                 using var userInfoRequest = new UserInfoRequest
                 {
                     Address = discoveryDoc.UserInfoEndpoint,
