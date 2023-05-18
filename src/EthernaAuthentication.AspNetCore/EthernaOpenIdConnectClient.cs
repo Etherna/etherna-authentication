@@ -94,16 +94,12 @@ namespace Etherna.Authentication
         private async Task<Claim> GetClaimAsync(string claimType)
         {
             var claim = await TryGetClaimAsync(claimType).ConfigureAwait(false);
-            if (claim is null)
-                throw new KeyNotFoundException($"Claim type {claimType} not found");
-
-            return claim;
+            return claim ?? throw new KeyNotFoundException($"Claim type {claimType} not found");
         }
 
         private async Task<Claim?> TryGetClaimAsync(string claimType)
         {
-            var httpContext = httpContextAccessor.HttpContext;
-            if (httpContext is null)
+            var httpContext = httpContextAccessor.HttpContext ??
                 throw new InvalidOperationException("HttpContext can't be null");
 
             var user = httpContext.User;
