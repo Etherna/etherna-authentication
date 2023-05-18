@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Etherna.Authentication
 {
-    internal class DiscoveryDocumentService : IDiscoveryDocumentService
+    internal sealed class DiscoveryDocumentService : IDiscoveryDocumentService
     {
         // Fields.
         private readonly OpenIdConnectOptions options;

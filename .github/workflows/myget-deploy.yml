@@ -1,4 +1,4 @@
-name: Unstable release deploy to MyGet
+name: Stable and unstable release deploy to MyGet
 
 on:
   push:
@@ -12,14 +12,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@main
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
 
     - name: Setup dotnet
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 7.0.x
 
     - name: Build with dotnet
       run: dotnet build --configuration Release
