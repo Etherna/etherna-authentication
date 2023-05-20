@@ -16,7 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{712F092A-F6A
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{31E1AD76-ECC3-4AF5-9200-A8E6DEE5DFDF}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\myget-deploy.yml = .github\workflows\myget-deploy.yml
+		.github\workflows\myget-unstable-deploy.yml = .github\workflows\myget-unstable-deploy.yml
+		.github\workflows\nuget-stable-deploy.yml = .github\workflows\nuget-stable-deploy.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EthernaAuthentication.AspNetCore", "src\EthernaAuthentication.AspNetCore\EthernaAuthentication.AspNetCore.csproj", "{A7FDE183-EDB3-48F1-AD07-3CF202D863AA}"
