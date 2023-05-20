@@ -1,22 +1,26 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30517.126
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EthernaAuthentication", "src\EthernaAuthentication\EthernaAuthentication.csproj", "{65F6F144-C26C-464D-8089-09A0072E1C2A}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{27850E95-3778-4B90-84A7-FBB8F4DD368F}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
+		EthernaAuthentication.sln.licenseheader = EthernaAuthentication.sln.licenseheader
+		LICENSE = LICENSE
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{712F092A-F6AE-4A7F-B65F-B5B0ADC9849D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{31E1AD76-ECC3-4AF5-9200-A8E6DEE5DFDF}"
 	ProjectSection(SolutionItems) = preProject
-		.github\workflows\myget-deploy.yml = .github\workflows\myget-deploy.yml
+		.github\workflows\myget-unstable-deploy.yml = .github\workflows\myget-unstable-deploy.yml
+		.github\workflows\nuget-stable-deploy.yml = .github\workflows\nuget-stable-deploy.yml
 	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EthernaAuthentication.AspNetCore", "src\EthernaAuthentication.AspNetCore\EthernaAuthentication.AspNetCore.csproj", "{A7FDE183-EDB3-48F1-AD07-3CF202D863AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,17 +28,17 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{65F6F144-C26C-464D-8089-09A0072E1C2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{65F6F144-C26C-464D-8089-09A0072E1C2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{65F6F144-C26C-464D-8089-09A0072E1C2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{65F6F144-C26C-464D-8089-09A0072E1C2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7FDE183-EDB3-48F1-AD07-3CF202D863AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7FDE183-EDB3-48F1-AD07-3CF202D863AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7FDE183-EDB3-48F1-AD07-3CF202D863AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7FDE183-EDB3-48F1-AD07-3CF202D863AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{65F6F144-C26C-464D-8089-09A0072E1C2A} = {712F092A-F6AE-4A7F-B65F-B5B0ADC9849D}
 		{31E1AD76-ECC3-4AF5-9200-A8E6DEE5DFDF} = {27850E95-3778-4B90-84A7-FBB8F4DD368F}
+		{A7FDE183-EDB3-48F1-AD07-3CF202D863AA} = {712F092A-F6AE-4A7F-B65F-B5B0ADC9849D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BE970C17-E6A2-4FB9-8CF6-9BC80F2CAA4E}
