@@ -60,6 +60,12 @@ namespace Etherna.Authentication
             return JsonSerializer.Deserialize<string[]>(claim.Value) ?? Array.Empty<string>();
         }
 
+        public async Task<string> GetUserIdAsync()
+        {
+            var claim = await GetClaimAsync(EthernaClaimTypes.UserId).ConfigureAwait(false);
+            return claim.Value;
+        }
+
         public async Task<string> GetUsernameAsync()
         {
             var claim = await GetClaimAsync(EthernaClaimTypes.Username).ConfigureAwait(false);
@@ -84,6 +90,12 @@ namespace Etherna.Authentication
             return claim is null ? null : JsonSerializer.Deserialize<string[]>(claim.Value);
         }
 
+        public async Task<string?> TryGetUserIdAsync()
+        {
+            var claim = await TryGetClaimAsync(EthernaClaimTypes.UserId).ConfigureAwait(false);
+            return claim?.Value;
+        }
+
         public async Task<string?> TryGetUsernameAsync()
         {
             var claim = await TryGetClaimAsync(EthernaClaimTypes.Username).ConfigureAwait(false);
@@ -95,25 +107,6 @@ namespace Etherna.Authentication
         {
             var claim = await TryGetClaimAsync(claimType).ConfigureAwait(false);
             return claim ?? throw new KeyNotFoundException($"Claim type {claimType} not found");
-        }
-
-        private async Task<Claim?> TryGetClaimAsync(string claimType)
-        {
-            var httpContext = httpContextAccessor.HttpContext ??
-                throw new InvalidOperationException("HttpContext can't be null");
-
-            var user = httpContext.User;
-            var claim = user.Claims.FirstOrDefault(c => c.Type == claimType);
-
-            if (claim is not null)
-                return claim;
-
-            var accessToken = await httpContext.GetTokenAsync("access_token").ConfigureAwait(false);
-            if (accessToken is null)
-                return null;
-
-            var userInfo = await GetUserInfoAsync(accessToken).ConfigureAwait(false);
-            return userInfo.FirstOrDefault(c => c.Type == claimType);
         }
 
         private async Task<IEnumerable<Claim>> GetUserInfoAsync(string accessToken)
@@ -137,6 +130,25 @@ namespace Etherna.Authentication
             }
 
             return _userInfo;
+        }
+
+        private async Task<Claim?> TryGetClaimAsync(string claimType)
+        {
+            var httpContext = httpContextAccessor.HttpContext ??
+                throw new InvalidOperationException("HttpContext can't be null");
+
+            var user = httpContext.User;
+            var claim = user.Claims.FirstOrDefault(c => c.Type == claimType);
+
+            if (claim is not null)
+                return claim;
+
+            var accessToken = await httpContext.GetTokenAsync("access_token").ConfigureAwait(false);
+            if (accessToken is null)
+                return null;
+
+            var userInfo = await GetUserInfoAsync(accessToken).ConfigureAwait(false);
+            return userInfo.FirstOrDefault(c => c.Type == claimType);
         }
     }
 }

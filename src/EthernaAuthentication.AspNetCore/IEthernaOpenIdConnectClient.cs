@@ -21,10 +21,12 @@ namespace Etherna.Authentication
         Task<string> GetClientIdAsync();
         Task<string> GetEtherAddressAsync();
         Task<string[]> GetEtherPrevAddressesAsync();
+        Task<string> GetUserIdAsync();
         Task<string> GetUsernameAsync();
         Task<string?> TryGetClientIdAsync();
         Task<string?> TryGetEtherAddressAsync();
         Task<string[]?> TryGetEtherPrevAddressesAsync();
+        Task<string?> TryGetUserIdAsync();
         Task<string?> TryGetUsernameAsync();
     }
 }

@@ -12,6 +12,8 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
+using IdentityModel;
+
 namespace Etherna.Authentication
 {
     public static class EthernaClaimTypes
@@ -20,7 +22,8 @@ namespace Etherna.Authentication
         public const string EtherAddress = "ether_address";
         public const string EtherPreviousAddresses = "ether_prev_addresses";
         public const string IsWeb3Account = "isWeb3Account";
-        public const string Role = System.Security.Claims.ClaimTypes.Role;
+        public const string Role = JwtClaimTypes.Role;
+        public const string UserId = JwtClaimTypes.Subject;
         public const string Username = "preferred_username";
     }
 }
