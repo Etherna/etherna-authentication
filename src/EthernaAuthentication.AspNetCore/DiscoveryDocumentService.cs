@@ -18,7 +18,7 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Etherna.Authentication
+namespace Etherna.Authentication.AspNetCore
 {
     internal sealed class DiscoveryDocumentService : IDiscoveryDocumentService
     {

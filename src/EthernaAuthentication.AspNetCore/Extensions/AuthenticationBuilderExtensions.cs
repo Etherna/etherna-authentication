@@ -12,12 +12,12 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-using Etherna.Authentication;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace Microsoft.AspNetCore.Authentication.OpenIdConnect
+namespace Etherna.Authentication.AspNetCore.Extensions
 {
     /// <summary>
     /// Extension methods to configure Etherna OpenId Connect client.

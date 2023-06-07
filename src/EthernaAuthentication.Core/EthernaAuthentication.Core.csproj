@@ -1,18 +1,18 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
-    <RootNamespace>Etherna.Authentication.AspNetCore</RootNamespace>
-    
+    <RootNamespace>Etherna.Authentication</RootNamespace>
+
     <Authors>Etherna Sagl</Authors>
-    <Description>An Etherna authentication client for Asp.Net Core</Description>
-    
+    <Description>Core library for Etherna authentication client</Description>
+
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Nullable>enable</Nullable>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
 
-    <PackageId>Etherna.Authentication.AspNetCore</PackageId>
+    <PackageId>Etherna.Authentication</PackageId>
     <RepositoryUrl>https://github.com/Etherna/etherna-authentication</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -28,7 +28,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.16" />
+    <PackageReference Include="IdentityModel" Version="6.1.0" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -40,10 +40,6 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\EthernaAuthentication.Core\EthernaAuthentication.Core.csproj" />
   </ItemGroup>
 
 </Project>
