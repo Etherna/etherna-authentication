@@ -23,7 +23,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Etherna.Authentication
+namespace Etherna.Authentication.AspNetCore
 {
     public class EthernaOpenIdConnectClient : IEthernaOpenIdConnectClient
     {
