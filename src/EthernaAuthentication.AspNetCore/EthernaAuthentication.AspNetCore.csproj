@@ -5,7 +5,7 @@
     <RootNamespace>Etherna.Authentication.AspNetCore</RootNamespace>
     
     <Authors>Etherna Sagl</Authors>
-    <Description>An Etherna authentication client for Asp.Net Core</Description>
+    <Description>An Etherna authentication client for Asp.Net Core applications</Description>
     
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Nullable>enable</Nullable>
@@ -43,7 +43,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EthernaAuthentication.Core\EthernaAuthentication.Core.csproj" />
+    <ProjectReference Include="..\EthernaAuthentication\EthernaAuthentication.csproj" />
   </ItemGroup>
 
 </Project>
