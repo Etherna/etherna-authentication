@@ -13,7 +13,6 @@
 //   limitations under the License.
 
 using IdentityModel.Client;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -23,14 +22,17 @@ namespace Etherna.Authentication.AspNetCore
     internal sealed class DiscoveryDocumentService : IDiscoveryDocumentService
     {
         // Fields.
-        private readonly OpenIdConnectOptions options;
+        private readonly string authority;
+        private readonly bool requireHttpsMetadata;
         private DiscoveryDocumentResponse? _discoveryDoc;
 
         // Constructor.
         public DiscoveryDocumentService(
-            OpenIdConnectOptions options)
+            string authority,
+            bool requireHttpsMetadata = true)
         {
-            this.options = options;
+            this.authority = authority;
+            this.requireHttpsMetadata = requireHttpsMetadata;
         }
 
         // Method.
@@ -41,8 +43,8 @@ namespace Etherna.Authentication.AspNetCore
                 using var httpClient = new HttpClient();
                 using var discoveryRequest = new DiscoveryDocumentRequest
                 {
-                    Address = options.Authority,
-                    Policy = new DiscoveryPolicy { RequireHttps = options.RequireHttpsMetadata }
+                    Address = authority,
+                    Policy = new DiscoveryPolicy { RequireHttps = requireHttpsMetadata }
                 };
 
                 var discoveryDoc = await httpClient.GetDiscoveryDocumentAsync(discoveryRequest).ConfigureAwait(false);

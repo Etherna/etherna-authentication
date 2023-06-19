@@ -24,6 +24,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EthernaAuthentication.AspNe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EthernaAuthentication", "src\EthernaAuthentication\EthernaAuthentication.csproj", "{C27B52F7-8AA5-488A-9756-C12BB57438AE}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EthernaAuthentication.NativeAsp", "src\EthernaAuthentication.NativeAsp\EthernaAuthentication.NativeAsp.csproj", "{0A659E29-77B0-4442-9F40-D2B1F8A412AC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EthernaAuthentication.NativeScript", "src\EthernaAuthentication.NativeScript\EthernaAuthentication.NativeScript.csproj", "{7E3C6212-78F5-4891-B207-7942E275CAC4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +42,14 @@ Global
 		{C27B52F7-8AA5-488A-9756-C12BB57438AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C27B52F7-8AA5-488A-9756-C12BB57438AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C27B52F7-8AA5-488A-9756-C12BB57438AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A659E29-77B0-4442-9F40-D2B1F8A412AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A659E29-77B0-4442-9F40-D2B1F8A412AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A659E29-77B0-4442-9F40-D2B1F8A412AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A659E29-77B0-4442-9F40-D2B1F8A412AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E3C6212-78F5-4891-B207-7942E275CAC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E3C6212-78F5-4891-B207-7942E275CAC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E3C6212-78F5-4891-B207-7942E275CAC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E3C6212-78F5-4891-B207-7942E275CAC4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -46,6 +58,8 @@ Global
 		{31E1AD76-ECC3-4AF5-9200-A8E6DEE5DFDF} = {27850E95-3778-4B90-84A7-FBB8F4DD368F}
 		{A7FDE183-EDB3-48F1-AD07-3CF202D863AA} = {712F092A-F6AE-4A7F-B65F-B5B0ADC9849D}
 		{C27B52F7-8AA5-488A-9756-C12BB57438AE} = {712F092A-F6AE-4A7F-B65F-B5B0ADC9849D}
+		{0A659E29-77B0-4442-9F40-D2B1F8A412AC} = {712F092A-F6AE-4A7F-B65F-B5B0ADC9849D}
+		{7E3C6212-78F5-4891-B207-7942E275CAC4} = {712F092A-F6AE-4A7F-B65F-B5B0ADC9849D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BE970C17-E6A2-4FB9-8CF6-9BC80F2CAA4E}
