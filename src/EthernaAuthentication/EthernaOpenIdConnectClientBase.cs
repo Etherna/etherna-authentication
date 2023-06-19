@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Etherna.Authentication
 {
-    public abstract class EthernaOpenIdConnectClientBase
+    public abstract class EthernaOpenIdConnectClientBase : IEthernaOpenIdConnectClient
     {
         // Fields.
         private readonly IDiscoveryDocumentService discoveryDocumentService;

@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Etherna.Authentication.AspNetCore
 {
-    public class EthernaOpenIdConnectClient : EthernaOpenIdConnectClientBase, IEthernaOpenIdConnectClient
+    public class EthernaOpenIdConnectClient : EthernaOpenIdConnectClientBase
     {
         // Fields.
         private readonly IHttpContextAccessor httpContextAccessor;
