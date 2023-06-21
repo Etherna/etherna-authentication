@@ -17,7 +17,7 @@ namespace Etherna.Authentication.NativeAsp
             Action<HttpClient>? configureManagedHttpClient = null)
         {
             // Register memory cache to keep tokens.
-            services.AddSingleton<IUserTokenStore, UserTokenStore>();
+            services.AddSingleton<IUserTokenStore, LocalUserTokenStore>();
 
             // Add Etherna OpenID Connect.
             services.AddAuthentication()
@@ -26,7 +26,7 @@ namespace Etherna.Authentication.NativeAsp
             // Adds services for token management.
             services.AddOpenIdConnectAccessTokenManagement();
 
-            // registers HTTP client that uses the managed user access token
+            // Register HTTP client that uses the managed user access token.
             if (managedHttpClientName is not null)
                 services.AddUserAccessTokenHttpClient(
                     managedHttpClientName,

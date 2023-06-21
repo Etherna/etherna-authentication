@@ -24,7 +24,8 @@ namespace Etherna.Authentication
         // Fields.
         private readonly string authority;
         private readonly bool requireHttpsMetadata;
-        private DiscoveryDocumentResponse? _discoveryDoc;
+
+        private DiscoveryDocumentResponse? discoveryDoc;
 
         // Constructor.
         public DiscoveryDocumentService(
@@ -38,7 +39,7 @@ namespace Etherna.Authentication
         // Method.
         public async Task<DiscoveryDocumentResponse> GetDiscoveryDocumentAsync()
         {
-            if (_discoveryDoc is null)
+            if (discoveryDoc is null)
             {
                 using var httpClient = new HttpClient();
                 using var discoveryRequest = new DiscoveryDocumentRequest
@@ -51,10 +52,10 @@ namespace Etherna.Authentication
                 if (discoveryDoc.IsError)
                     throw discoveryDoc.Exception ?? new InvalidOperationException();
 
-                _discoveryDoc = discoveryDoc;
+                this.discoveryDoc = discoveryDoc;
             }
 
-            return _discoveryDoc;
+            return discoveryDoc;
         }
     }
 }

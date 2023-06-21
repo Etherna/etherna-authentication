@@ -17,7 +17,7 @@ It provides support to registration with extension on Asp.Net `AuthenticationBui
 * **Etherna.Authentication.NativeAsp** implement authentication client with code flow for native applications, using a local Asp.Net return page.  
 It provides management of user's access tokens, and is the recomended library to implement user authentication with native applications.
 
-* **Etherna.Authentication.NativeScript** implements authentication client with password flow for native scripted application.  
+* **Etherna.Authentication.NativeScript** implements managed authentication client with password flow for native scripted application.  
 Password flow is necessary to implement authentication with Etherna's API keys, and it is required by applications with scripted user authentication.  
 Because password flow is generally considered less secure than code flow, use this package only if *Etherna.Authentication.NativeAsp* is not an option.
 

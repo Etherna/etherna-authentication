@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Etherna.Authentication.NativeAsp.Utils
 {
-    internal sealed class UserTokenStore : IUserTokenStore
+    internal sealed class LocalUserTokenStore : IUserTokenStore
     {
         // Fields.
         private readonly IDictionary<ClaimsPrincipal, UserToken> tokenDictionary = new Dictionary<ClaimsPrincipal, UserToken>();
@@ -21,7 +21,7 @@ namespace Etherna.Authentication.NativeAsp.Utils
         {
             if (tokenDictionary.TryGetValue(user, out var token))
                 return Task.FromResult(token);
-            return Task.FromResult<UserToken>(default!);
+            return Task.FromResult(new UserToken());
         }
 
         public Task StoreTokenAsync(ClaimsPrincipal user, UserToken token, UserTokenRequestParameters? parameters = null)
