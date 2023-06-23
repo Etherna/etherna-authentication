@@ -9,18 +9,20 @@ using System.Threading.Tasks;
 
 namespace Etherna.Authentication
 {
-    public abstract class EthernaOpenIdConnectClientBase
+    public abstract class EthernaOpenIdConnectClientBase : IEthernaOpenIdConnectClient
     {
         // Fields.
-        private readonly IDiscoveryDocumentService discoveryDocumentService;
-        private IEnumerable<Claim>? _userInfo;
+        private IEnumerable<Claim>? userInfo;
 
         // Constructor.
         protected EthernaOpenIdConnectClientBase(
             IDiscoveryDocumentService discoveryDocumentService)
         {
-            this.discoveryDocumentService = discoveryDocumentService;
+            DiscoveryDocumentService = discoveryDocumentService;
         }
+
+        // Properties.
+        public IDiscoveryDocumentService DiscoveryDocumentService { get; }
 
         // Methods.
         public async Task<string> GetClientIdAsync()
@@ -84,8 +86,8 @@ namespace Etherna.Authentication
         }
 
         // Protected methods.
+        protected abstract IEnumerable<Claim> GetCurrentUserClaims();
         protected abstract Task<string> GetUserAccessTokenAsync();
-        protected abstract ClaimsPrincipal GetCurrentUserClaimsPrincipal();
 
         // Helpers.
         private async Task<Claim> GetClaimAsync(string claimType)
@@ -96,10 +98,10 @@ namespace Etherna.Authentication
 
         private async Task<IEnumerable<Claim>> GetUserInfoAsync(string accessToken)
         {
-            if (_userInfo is null)
+            if (userInfo is null)
             {
                 // Get discovery document.
-                var discoveryDoc = await discoveryDocumentService.GetDiscoveryDocumentAsync().ConfigureAwait(false);
+                var discoveryDoc = await DiscoveryDocumentService.GetDiscoveryDocumentAsync().ConfigureAwait(false);
 
                 // Get user info.
                 using var httpClient = new HttpClient();
@@ -111,16 +113,16 @@ namespace Etherna.Authentication
                 var response = await httpClient.GetUserInfoAsync(userInfoRequest).ConfigureAwait(false);
 
                 // Cache claims.
-                _userInfo = response.Claims;
+                userInfo = response.Claims;
             }
 
-            return _userInfo;
+            return userInfo;
         }
 
         private async Task<Claim?> TryGetClaimAsync(string claimType)
         {
-            var user = GetCurrentUserClaimsPrincipal();
-            var claim = user.Claims.FirstOrDefault(c => c.Type == claimType);
+            var userClaims = GetCurrentUserClaims();
+            var claim = userClaims.FirstOrDefault(c => c.Type == claimType);
 
             if (claim is not null)
                 return claim;

@@ -13,46 +13,49 @@
 //   limitations under the License.
 
 using IdentityModel.Client;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Etherna.Authentication.AspNetCore
+namespace Etherna.Authentication
 {
-    internal sealed class DiscoveryDocumentService : IDiscoveryDocumentService
+    public class DiscoveryDocumentService : IDiscoveryDocumentService
     {
         // Fields.
-        private readonly OpenIdConnectOptions options;
-        private DiscoveryDocumentResponse? _discoveryDoc;
+        private readonly string authority;
+        private readonly bool requireHttpsMetadata;
+
+        private DiscoveryDocumentResponse? discoveryDoc;
 
         // Constructor.
         public DiscoveryDocumentService(
-            OpenIdConnectOptions options)
+            string authority,
+            bool requireHttpsMetadata = true)
         {
-            this.options = options;
+            this.authority = authority;
+            this.requireHttpsMetadata = requireHttpsMetadata;
         }
 
         // Method.
         public async Task<DiscoveryDocumentResponse> GetDiscoveryDocumentAsync()
         {
-            if (_discoveryDoc is null)
+            if (discoveryDoc is null)
             {
                 using var httpClient = new HttpClient();
                 using var discoveryRequest = new DiscoveryDocumentRequest
                 {
-                    Address = options.Authority,
-                    Policy = new DiscoveryPolicy { RequireHttps = options.RequireHttpsMetadata }
+                    Address = authority,
+                    Policy = new DiscoveryPolicy { RequireHttps = requireHttpsMetadata }
                 };
 
                 var discoveryDoc = await httpClient.GetDiscoveryDocumentAsync(discoveryRequest).ConfigureAwait(false);
                 if (discoveryDoc.IsError)
                     throw discoveryDoc.Exception ?? new InvalidOperationException();
 
-                _discoveryDoc = discoveryDoc;
+                this.discoveryDoc = discoveryDoc;
             }
 
-            return _discoveryDoc;
+            return discoveryDoc;
         }
     }
 }

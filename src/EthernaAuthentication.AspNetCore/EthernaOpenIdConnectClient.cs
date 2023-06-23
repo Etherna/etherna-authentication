@@ -15,12 +15,13 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Etherna.Authentication.AspNetCore
 {
-    public class EthernaOpenIdConnectClient : EthernaOpenIdConnectClientBase, IEthernaOpenIdConnectClient
+    public class EthernaOpenIdConnectClient : EthernaOpenIdConnectClientBase
     {
         // Fields.
         private readonly IHttpContextAccessor httpContextAccessor;
@@ -35,12 +36,12 @@ namespace Etherna.Authentication.AspNetCore
         }
 
         // Protected methods.
-        protected override ClaimsPrincipal GetCurrentUserClaimsPrincipal()
+        protected override IEnumerable<Claim> GetCurrentUserClaims()
         {
             var httpContext = httpContextAccessor.HttpContext ??
                 throw new InvalidOperationException("HttpContext can't be null");
 
-            return httpContext.User;
+            return httpContext.User.Claims;
         }
 
         protected override async Task<string> GetUserAccessTokenAsync()

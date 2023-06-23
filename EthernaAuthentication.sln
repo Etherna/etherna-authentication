@@ -22,7 +22,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EthernaAuthentication.AspNetCore", "src\EthernaAuthentication.AspNetCore\EthernaAuthentication.AspNetCore.csproj", "{A7FDE183-EDB3-48F1-AD07-3CF202D863AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EthernaAuthentication.Core", "src\EthernaAuthentication.Core\EthernaAuthentication.Core.csproj", "{5198E195-288D-4AA5-8D0C-32CC69EA8FDA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EthernaAuthentication", "src\EthernaAuthentication\EthernaAuthentication.csproj", "{C27B52F7-8AA5-488A-9756-C12BB57438AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EthernaAuthentication.Native", "src\EthernaAuthentication.Native\EthernaAuthentication.Native.csproj", "{C994D539-C6B9-427A-83D4-333D240BFFB6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,10 +36,14 @@ Global
 		{A7FDE183-EDB3-48F1-AD07-3CF202D863AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7FDE183-EDB3-48F1-AD07-3CF202D863AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7FDE183-EDB3-48F1-AD07-3CF202D863AA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5198E195-288D-4AA5-8D0C-32CC69EA8FDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5198E195-288D-4AA5-8D0C-32CC69EA8FDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5198E195-288D-4AA5-8D0C-32CC69EA8FDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5198E195-288D-4AA5-8D0C-32CC69EA8FDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C27B52F7-8AA5-488A-9756-C12BB57438AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C27B52F7-8AA5-488A-9756-C12BB57438AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C27B52F7-8AA5-488A-9756-C12BB57438AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C27B52F7-8AA5-488A-9756-C12BB57438AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C994D539-C6B9-427A-83D4-333D240BFFB6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C994D539-C6B9-427A-83D4-333D240BFFB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C994D539-C6B9-427A-83D4-333D240BFFB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C994D539-C6B9-427A-83D4-333D240BFFB6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -45,7 +51,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{31E1AD76-ECC3-4AF5-9200-A8E6DEE5DFDF} = {27850E95-3778-4B90-84A7-FBB8F4DD368F}
 		{A7FDE183-EDB3-48F1-AD07-3CF202D863AA} = {712F092A-F6AE-4A7F-B65F-B5B0ADC9849D}
-		{5198E195-288D-4AA5-8D0C-32CC69EA8FDA} = {712F092A-F6AE-4A7F-B65F-B5B0ADC9849D}
+		{C27B52F7-8AA5-488A-9756-C12BB57438AE} = {712F092A-F6AE-4A7F-B65F-B5B0ADC9849D}
+		{C994D539-C6B9-427A-83D4-333D240BFFB6} = {712F092A-F6AE-4A7F-B65F-B5B0ADC9849D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BE970C17-E6A2-4FB9-8CF6-9BC80F2CAA4E}
