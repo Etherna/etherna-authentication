@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Threading.Tasks;
 
-namespace Etherna.Authentication.NativeAsp.Utils
+namespace Etherna.Authentication.Native.CodeFlow
 {
     internal sealed class LoopbackHttpListener : IDisposable
     {

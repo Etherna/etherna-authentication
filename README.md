@@ -14,12 +14,13 @@ Doesn't offer any default client registration method, or authentication flow.
 * **Etherna.Authentication.AspNetCore** implements authentication client with code flow for Asp.Net projects.  
 It provides support to registration with extension on Asp.Net `AuthenticationBuilder`.
 
-* **Etherna.Authentication.NativeAsp** implement authentication client with code flow for native applications, using a local Asp.Net return page.  
-It provides management of user's access tokens, and is the recomended library to implement user authentication with native applications.
-
-* **Etherna.Authentication.NativeScript** implements managed authentication client with password flow for native scripted application.  
-Password flow is necessary to implement authentication with Etherna's API keys, and it is required by applications with scripted user authentication.  
-Because password flow is generally considered less secure than code flow, use this package only if *Etherna.Authentication.NativeAsp* is not an option.
+* **Etherna.Authentication.Native** implement authentication client for native local applications.  
+It provides management of user's access tokens, and offers two different authentication flows:
+  * *Code flow*: is the recomended flow to implement user authentication with native applications.  
+    It creates a local Asp.Net return page, and receives the authentication output from sso redirection.
+  * *Password flow*: is used with api key user authentication. It permits to authenticate an user without its direct interaction.  
+    It is required by applications with scripted user authentication, but it is generally considered less secure than code flow.  
+    Use api key aythentication only if code flow is not an option, because of scripting automation requirements.
 
 ## Issue reports
 

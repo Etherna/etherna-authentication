@@ -2,17 +2,17 @@
 
   <PropertyGroup>
     <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
-    <RootNamespace>Etherna.Authentication.NativeScript</RootNamespace>
+    <RootNamespace>Etherna.Authentication.Native</RootNamespace>
 
     <Authors>Etherna Sagl</Authors>
-    <Description>An Etherna authentication client for native scripted .Net applications</Description>
+    <Description>An Etherna authentication client for native .Net applications</Description>
 
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <Nullable>enable</Nullable>
     <EnableNETAnalyzers>true</EnableNETAnalyzers>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
 
-    <PackageId>Etherna.Authentication.NativeScript</PackageId>
+    <PackageId>Etherna.Authentication.Native</PackageId>
     <RepositoryUrl>https://github.com/Etherna/etherna-authentication</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
@@ -24,10 +24,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Duende.AccessTokenManagement.OpenIdConnect" Version="2.0.1" />
     <PackageReference Include="GitVersion.MsBuild" Version="5.12.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="IdentityModel.OidcClient" Version="5.2.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

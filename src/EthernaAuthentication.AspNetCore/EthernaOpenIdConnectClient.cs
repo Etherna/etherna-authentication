@@ -36,12 +36,12 @@ namespace Etherna.Authentication.AspNetCore
         }
 
         // Protected methods.
-        protected override Task<IEnumerable<Claim>> GetCurrentUserClaimsAsync()
+        protected override IEnumerable<Claim> GetCurrentUserClaims()
         {
             var httpContext = httpContextAccessor.HttpContext ??
                 throw new InvalidOperationException("HttpContext can't be null");
 
-            return Task.FromResult(httpContext.User.Claims);
+            return httpContext.User.Claims;
         }
 
         protected override async Task<string> GetUserAccessTokenAsync()

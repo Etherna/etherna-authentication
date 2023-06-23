@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Etherna.Authentication.NativeAsp.Utils
+namespace Etherna.Authentication.Native.CodeFlow
 {
     internal sealed class SystemBrowser : IBrowser
     {

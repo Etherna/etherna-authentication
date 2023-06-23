@@ -86,7 +86,7 @@ namespace Etherna.Authentication
         }
 
         // Protected methods.
-        protected abstract Task<IEnumerable<Claim>> GetCurrentUserClaimsAsync();
+        protected abstract IEnumerable<Claim> GetCurrentUserClaims();
         protected abstract Task<string> GetUserAccessTokenAsync();
 
         // Helpers.
@@ -121,7 +121,7 @@ namespace Etherna.Authentication
 
         private async Task<Claim?> TryGetClaimAsync(string claimType)
         {
-            var userClaims = await GetCurrentUserClaimsAsync().ConfigureAwait(false);
+            var userClaims = GetCurrentUserClaims();
             var claim = userClaims.FirstOrDefault(c => c.Type == claimType);
 
             if (claim is not null)
