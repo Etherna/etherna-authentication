@@ -12,13 +12,18 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-using IdentityModel.Client;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
-namespace Etherna.Authentication
+namespace Etherna.Authentication.Native
 {
-    public interface IDiscoveryDocumentService
+    public interface IEthernaSignInService
     {
-        Task<DiscoveryDocumentResponse> GetDiscoveryDocumentAsync();
+        // Properties.
+        ClaimsPrincipal? CurrentUser { get; }
+        bool IsAuthenticated { get; }
+
+        // Methods.
+        Task SignInAsync();
     }
 }

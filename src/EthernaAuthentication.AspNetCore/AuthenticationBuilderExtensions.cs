@@ -12,30 +12,18 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-using Etherna.Authentication;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace Microsoft.AspNetCore.Authentication.OpenIdConnect
+namespace Etherna.Authentication.AspNetCore
 {
     /// <summary>
     /// Extension methods to configure Etherna OpenId Connect client.
     /// </summary>
     public static class EthernaAuthenticationOptionsExtensions
     {
-        /// <summary>
-        /// Adds Etherna OpenIdConnect-based authentication to <see cref="AuthenticationBuilder"/> using the default scheme.
-        /// The default scheme is specified by <see cref="EthernaDefaults.AuthenticationScheme"/>.
-        /// <para>
-        /// Etherna authentication allows application users to sign in with their Etherna account.
-        /// </para>
-        /// </summary>
-        /// <param name="builder">The <see cref="AuthenticationBuilder"/>.</param>
-        /// <returns>A reference to <paramref name="builder"/> after the operation has completed.</returns>
-        public static AuthenticationBuilder AddEthernaOpenIdConnect(this AuthenticationBuilder builder)
-            => builder.AddEthernaOpenIdConnect(EthernaDefaults.AuthenticationScheme, _ => { });
-
         /// <summary>
         /// Adds Etherna OpenIdConnect-based authentication to <see cref="AuthenticationBuilder"/> using the default scheme.
         /// The default scheme is specified by <see cref="EthernaDefaults.AuthenticationScheme"/>.
@@ -76,6 +64,7 @@ namespace Microsoft.AspNetCore.Authentication.OpenIdConnect
         /// <param name="configureOptions">A delegate to configure <see cref="OpenIdConnectOptions"/>.</param>
         public static AuthenticationBuilder AddEthernaOpenIdConnect(this AuthenticationBuilder builder, string authenticationScheme, string displayName, Action<OpenIdConnectOptions> configureOptions)
         {
+            // Check conditions.
             if (builder is null)
                 throw new ArgumentNullException(nameof(builder));
             if (configureOptions is null)
@@ -83,11 +72,18 @@ namespace Microsoft.AspNetCore.Authentication.OpenIdConnect
 
             var options = new OpenIdConnectOptions();
             configureOptions(options);
-            builder.Services.AddSingleton<IDiscoveryDocumentService>(new DiscoveryDocumentService(options));
 
+            if (options.Authority is null)
+                throw new InvalidOperationException("Authority can't be null");
+
+            // Add Etherna oidc client.
+            builder.Services.AddSingleton<IDiscoveryDocumentService>(
+                new DiscoveryDocumentService(options.Authority, options.RequireHttpsMetadata));
             builder.Services.AddScoped<IEthernaOpenIdConnectClient, EthernaOpenIdConnectClient>();
 
-            return builder.AddOpenIdConnect(authenticationScheme, displayName, configureOptions);
+            builder.AddOpenIdConnect(authenticationScheme, displayName, configureOptions);
+
+            return builder;
         }
     }
 }
