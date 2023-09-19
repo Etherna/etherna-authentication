@@ -52,5 +52,29 @@ namespace Etherna.Authentication.AspNetCore
             return await httpContext.GetTokenAsync("access_token").ConfigureAwait(false) ??
                 throw new InvalidOperationException("Invalid null access token");
         }
+
+        protected override IEnumerable<Claim> TryGetCurrentUserClaims()
+        {
+            try
+            {
+                return GetCurrentUserClaims();
+            }
+            catch (InvalidOperationException)
+            {
+                return Array.Empty<Claim>();
+            }
+        }
+
+        protected override async Task<string?> TryGetUserAccessTokenAsync()
+        {
+            try
+            {
+                return await GetUserAccessTokenAsync().ConfigureAwait(false);
+            }
+            catch (InvalidOperationException)
+            {
+                return null;
+            }
+        }
     }
 }
