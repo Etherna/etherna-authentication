@@ -60,5 +60,29 @@ namespace Etherna.Authentication.Native
 
             return userToken.AccessToken;
         }
+
+        protected override IEnumerable<Claim> TryGetCurrentUserClaims()
+        {
+            try
+            {
+                return GetCurrentUserClaims();
+            }
+            catch (InvalidOperationException)
+            {
+                return Array.Empty<Claim>();
+            }
+        }
+
+        protected override async Task<string?> TryGetUserAccessTokenAsync()
+        {
+            try
+            {
+                return await GetUserAccessTokenAsync().ConfigureAwait(false);
+            }
+            catch (InvalidOperationException)
+            {
+                return null;
+            }
+        }
     }
 }
