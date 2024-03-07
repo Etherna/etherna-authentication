@@ -65,10 +65,8 @@ namespace Etherna.Authentication.AspNetCore
         public static AuthenticationBuilder AddEthernaOpenIdConnect(this AuthenticationBuilder builder, string authenticationScheme, string displayName, Action<OpenIdConnectOptions> configureOptions)
         {
             // Check conditions.
-            if (builder is null)
-                throw new ArgumentNullException(nameof(builder));
-            if (configureOptions is null)
-                throw new ArgumentNullException(nameof(configureOptions));
+            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+            ArgumentNullException.ThrowIfNull(configureOptions, nameof(configureOptions));
 
             var options = new OpenIdConnectOptions();
             configureOptions(options);

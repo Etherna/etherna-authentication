@@ -41,10 +41,8 @@ namespace Etherna.Authentication.Native.PasswordFlow
             IOptions<EthernaApiKeySignInServiceOptions> signInServiceOptions,
             IUserTokenStore userTokenStore)
         {
-            if (openIdConnectOptionsMonitor is null)
-                throw new ArgumentNullException(nameof(openIdConnectOptionsMonitor));
-            if (signInServiceOptions is null)
-                throw new ArgumentNullException(nameof(signInServiceOptions));
+            ArgumentNullException.ThrowIfNull(openIdConnectOptionsMonitor, nameof(openIdConnectOptionsMonitor));
+            ArgumentNullException.ThrowIfNull(signInServiceOptions, nameof(signInServiceOptions));
 
             this.openIdConnectConfigurationService = openIdConnectConfigurationService;
             openIdConnectOptions = openIdConnectOptionsMonitor.Get(

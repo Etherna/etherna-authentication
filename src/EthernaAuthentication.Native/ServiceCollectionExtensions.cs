@@ -99,10 +99,8 @@ namespace Etherna.Authentication.Native
             Action<HttpClient>? configureManagedHttpClient)
         {
             // Check conditions.
-            if (services is null)
-                throw new ArgumentNullException(nameof(services));
-            if (configureOidcOptions is null)
-                throw new ArgumentNullException(nameof(configureOidcOptions));
+            ArgumentNullException.ThrowIfNull(services, nameof(services));
+            ArgumentNullException.ThrowIfNull(configureOidcOptions, nameof(configureOidcOptions));
 
             var options = new OpenIdConnectOptions();
             configureOidcOptions(options);

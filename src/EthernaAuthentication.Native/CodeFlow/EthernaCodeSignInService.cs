@@ -36,10 +36,8 @@ namespace Etherna.Authentication.Native.CodeFlow
             IOptions<EthernaCodeSignInServiceOptions> signInServiceOptions,
             IUserTokenStore userTokenStore)
         {
-            if (openIdConnectOptionsMonitor is null)
-                throw new ArgumentNullException(nameof(openIdConnectOptionsMonitor));
-            if (signInServiceOptions is null)
-                throw new ArgumentNullException(nameof(signInServiceOptions));
+            ArgumentNullException.ThrowIfNull(openIdConnectOptionsMonitor, nameof(openIdConnectOptionsMonitor));
+            ArgumentNullException.ThrowIfNull(signInServiceOptions, nameof(signInServiceOptions));
 
             openIdConnectOptions = openIdConnectOptionsMonitor.Get(
                 signInServiceOptions.Value.AuthenticationSchemeName);
