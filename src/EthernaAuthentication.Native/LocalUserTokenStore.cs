@@ -28,8 +28,7 @@ namespace Etherna.Authentication.Native
         // Methods.
         public Task ClearTokenAsync(ClaimsPrincipal user, UserTokenRequestParameters? parameters = null)
         {
-            if (user is null)
-                throw new ArgumentNullException(nameof(user));
+            ArgumentNullException.ThrowIfNull(user, nameof(user));
 
             var sub = user.FindFirst("sub")?.Value ?? throw new InvalidOperationException("no sub claim");
 
@@ -39,8 +38,7 @@ namespace Etherna.Authentication.Native
 
         public Task<UserToken> GetTokenAsync(ClaimsPrincipal user, UserTokenRequestParameters? parameters = null)
         {
-            if (user is null)
-                throw new ArgumentNullException(nameof(user));
+            ArgumentNullException.ThrowIfNull(user, nameof(user));
 
             var sub = user.FindFirst("sub")?.Value ?? throw new InvalidOperationException("no sub claim");
 
@@ -52,8 +50,7 @@ namespace Etherna.Authentication.Native
 
         public Task StoreTokenAsync(ClaimsPrincipal user, UserToken token, UserTokenRequestParameters? parameters = null)
         {
-            if (user is null)
-                throw new ArgumentNullException(nameof(user));
+            ArgumentNullException.ThrowIfNull(user, nameof(user));
 
             var sub = user.FindFirst("sub")?.Value ?? throw new InvalidOperationException("no sub claim");
             tokenDictionary[sub] = token;

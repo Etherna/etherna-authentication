@@ -55,7 +55,7 @@ namespace Etherna.Authentication.Native.CodeFlow
             this.successResponse = successResponse ?? DefaultSuccessResponse;
 
             path ??= string.Empty;
-            if (path.StartsWith("/", StringComparison.InvariantCultureIgnoreCase))
+            if (path.StartsWith('/'))
                 path = path[1..];
 
             _url = $"http://127.0.0.1:{port}/{path}";

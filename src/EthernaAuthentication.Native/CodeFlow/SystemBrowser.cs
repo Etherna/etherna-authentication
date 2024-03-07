@@ -58,8 +58,7 @@ namespace Etherna.Authentication.Native.CodeFlow
         // Methods.
         public async Task<BrowserResult> InvokeAsync(BrowserOptions options, CancellationToken cancellationToken)
         {
-            if (options is null)
-                throw new ArgumentNullException(nameof(options));
+            ArgumentNullException.ThrowIfNull(options, nameof(options));
 
             using var listener = new LoopbackHttpListener(
                 Port,
@@ -123,6 +122,10 @@ namespace Etherna.Authentication.Native.CodeFlow
             listener.Start();
             var port = ((IPEndPoint)listener.LocalEndpoint).Port;
             listener.Stop();
+
+#if NET8_0_OR_GREATER
+            listener.Dispose();
+#endif
             return port;
         }
     }
