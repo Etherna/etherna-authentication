@@ -4,7 +4,7 @@
     <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <RootNamespace>Etherna.Authentication</RootNamespace>
 
-    <Authors>Etherna Sagl</Authors>
+    <Authors>Etherna SA</Authors>
     <Description>Core library for Etherna authentication clients</Description>
 
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
