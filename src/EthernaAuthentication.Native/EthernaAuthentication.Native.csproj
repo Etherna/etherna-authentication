@@ -4,7 +4,7 @@
     <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
     <RootNamespace>Etherna.Authentication.Native</RootNamespace>
 
-    <Authors>Etherna Sagl</Authors>
+    <Authors>Etherna SA</Authors>
     <Description>An Etherna authentication client for native .Net applications</Description>
 
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
