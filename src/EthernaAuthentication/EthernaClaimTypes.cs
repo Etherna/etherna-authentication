@@ -13,6 +13,7 @@
 // limitations under the License.
 
 using IdentityModel;
+using System.Security.Claims;
 
 namespace Etherna.Authentication
 {
@@ -22,7 +23,8 @@ namespace Etherna.Authentication
         public const string EtherAddress = "ether_address";
         public const string EtherPreviousAddresses = "ether_prev_addresses";
         public const string IsWeb3Account = "isWeb3Account";
-        public const string Role = JwtClaimTypes.Role;
+        public const string Role_Dotnet = ClaimTypes.Role;
+        public const string Role_IdentityModel = JwtClaimTypes.Role;
         public const string UserId = JwtClaimTypes.Subject;
         public const string Username = "preferred_username";
     }
