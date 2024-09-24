@@ -57,6 +57,13 @@ namespace Etherna.Authentication
             return JsonSerializer.Deserialize<string[]>(claim.Value) ?? Array.Empty<string>();
         }
 
+        public async Task<string[]> GetRolesAsync()
+        {
+            var claim = await TryGetClaimAsync(EthernaClaimTypes.Role_Dotnet).ConfigureAwait(false) ??
+                        await GetClaimAsync(EthernaClaimTypes.Role_IdentityModel).ConfigureAwait(false);
+            return new[] { claim.Value };
+        }
+
         public async Task<string> GetUserIdAsync()
         {
             var claim = await GetClaimAsync(EthernaClaimTypes.UserId).ConfigureAwait(false);
@@ -85,6 +92,13 @@ namespace Etherna.Authentication
         {
             var claim = await TryGetClaimAsync(EthernaClaimTypes.EtherPreviousAddresses).ConfigureAwait(false);
             return claim is null ? null : JsonSerializer.Deserialize<string[]>(claim.Value);
+        }
+
+        public async Task<string[]?> TryGetRolesAsync()
+        {
+            var claim = await TryGetClaimAsync(EthernaClaimTypes.Role_Dotnet).ConfigureAwait(false) ??
+                        await TryGetClaimAsync(EthernaClaimTypes.Role_IdentityModel).ConfigureAwait(false);
+            return claim is null ? null : new[] { claim.Value };
         }
 
         public async Task<string?> TryGetUserIdAsync()
