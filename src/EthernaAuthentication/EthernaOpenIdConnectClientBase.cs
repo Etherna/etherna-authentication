@@ -48,7 +48,7 @@ namespace Etherna.Authentication
         public async Task<string[]> GetEtherPrevAddressesAsync()
         {
             var claim = await GetClaimAsync(EthernaClaimTypes.EtherPreviousAddresses).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<string[]>(claim.Value) ?? [];
+            return JsonSerializer.Deserialize(claim.Value, ClaimJsonSerializerContext.Default.StringArray) ?? [];
         }
 
         public async Task<string[]> GetRolesAsync()
@@ -85,7 +85,7 @@ namespace Etherna.Authentication
         public async Task<string[]?> TryGetEtherPrevAddressesAsync()
         {
             var claim = await TryGetClaimAsync(EthernaClaimTypes.EtherPreviousAddresses).ConfigureAwait(false);
-            return claim is null ? null : JsonSerializer.Deserialize<string[]>(claim.Value);
+            return claim is null ? null : JsonSerializer.Deserialize(claim.Value, ClaimJsonSerializerContext.Default.StringArray);
         }
 
         public async Task<string[]?> TryGetRolesAsync()
