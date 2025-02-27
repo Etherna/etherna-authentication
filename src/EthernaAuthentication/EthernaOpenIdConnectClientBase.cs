@@ -13,7 +13,6 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 using IdentityModel.Client;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -23,20 +22,15 @@ using System.Threading.Tasks;
 
 namespace Etherna.Authentication
 {
-    public abstract class EthernaOpenIdConnectClientBase : IEthernaOpenIdConnectClient
+    public abstract class EthernaOpenIdConnectClientBase(
+        IDiscoveryDocumentService discoveryDocumentService)
+        : IEthernaOpenIdConnectClient
     {
         // Fields.
         private IEnumerable<Claim>? userInfo;
 
-        // Constructor.
-        protected EthernaOpenIdConnectClientBase(
-            IDiscoveryDocumentService discoveryDocumentService)
-        {
-            DiscoveryDocumentService = discoveryDocumentService;
-        }
-
         // Properties.
-        public IDiscoveryDocumentService DiscoveryDocumentService { get; }
+        public IDiscoveryDocumentService DiscoveryDocumentService { get; } = discoveryDocumentService;
 
         // Methods.
         public async Task<string> GetClientIdAsync()
@@ -54,14 +48,14 @@ namespace Etherna.Authentication
         public async Task<string[]> GetEtherPrevAddressesAsync()
         {
             var claim = await GetClaimAsync(EthernaClaimTypes.EtherPreviousAddresses).ConfigureAwait(false);
-            return JsonSerializer.Deserialize<string[]>(claim.Value) ?? Array.Empty<string>();
+            return JsonSerializer.Deserialize<string[]>(claim.Value) ?? [];
         }
 
         public async Task<string[]> GetRolesAsync()
         {
             var claim = await TryGetClaimAsync(EthernaClaimTypes.Role_Dotnet).ConfigureAwait(false) ??
                         await GetClaimAsync(EthernaClaimTypes.Role_IdentityModel).ConfigureAwait(false);
-            return new[] { claim.Value };
+            return [claim.Value];
         }
 
         public async Task<string> GetUserIdAsync()
