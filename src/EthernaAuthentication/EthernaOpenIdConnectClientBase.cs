@@ -92,7 +92,7 @@ namespace Etherna.Authentication
         {
             var claim = await TryGetClaimAsync(EthernaClaimTypes.Role_Dotnet).ConfigureAwait(false) ??
                         await TryGetClaimAsync(EthernaClaimTypes.Role_IdentityModel).ConfigureAwait(false);
-            return claim is null ? null : new[] { claim.Value };
+            return claim is null ? null : [claim.Value];
         }
 
         public async Task<string?> TryGetUserIdAsync()
