@@ -77,7 +77,7 @@ namespace Etherna.Authentication.AspNetCore
             // Add Etherna oidc client.
             builder.Services.AddSingleton<IDiscoveryDocumentService>(
                 new DiscoveryDocumentService(options.Authority, options.RequireHttpsMetadata));
-            builder.Services.AddScoped<IEthernaOpenIdConnectClient, EthernaOpenIdConnectClient>();
+            builder.Services.AddSingleton<IEthernaOpenIdConnectClient, EthernaOpenIdConnectClient>();
 
             builder.AddOpenIdConnect(authenticationScheme, displayName, configureOptions);
 

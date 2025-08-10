@@ -21,20 +21,11 @@ using System.Threading.Tasks;
 
 namespace Etherna.Authentication.AspNetCore
 {
-    public class EthernaOpenIdConnectClient : EthernaOpenIdConnectClientBase
+    public class EthernaOpenIdConnectClient(
+        IDiscoveryDocumentService discoveryDocumentService,
+        IHttpContextAccessor httpContextAccessor)
+        : EthernaOpenIdConnectClientBase(discoveryDocumentService)
     {
-        // Fields.
-        private readonly IHttpContextAccessor httpContextAccessor;
-
-        // Constructor.
-        public EthernaOpenIdConnectClient(
-            IDiscoveryDocumentService discoveryDocumentService,
-            IHttpContextAccessor httpContextAccessor)
-            : base(discoveryDocumentService)
-        {
-            this.httpContextAccessor = httpContextAccessor;
-        }
-
         // Protected methods.
         protected override IEnumerable<Claim> GetCurrentUserClaims()
         {
@@ -61,7 +52,7 @@ namespace Etherna.Authentication.AspNetCore
             }
             catch (InvalidOperationException)
             {
-                return Array.Empty<Claim>();
+                return [];
             }
         }
 

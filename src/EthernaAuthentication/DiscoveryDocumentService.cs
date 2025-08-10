@@ -19,22 +19,13 @@ using System.Threading.Tasks;
 
 namespace Etherna.Authentication
 {
-    public class DiscoveryDocumentService : IDiscoveryDocumentService
+    public class DiscoveryDocumentService(
+        string authority,
+        bool requireHttpsMetadata = true)
+        : IDiscoveryDocumentService
     {
         // Fields.
-        private readonly string authority;
-        private readonly bool requireHttpsMetadata;
-
         private DiscoveryDocumentResponse? discoveryDoc;
-
-        // Constructor.
-        public DiscoveryDocumentService(
-            string authority,
-            bool requireHttpsMetadata = true)
-        {
-            this.authority = authority;
-            this.requireHttpsMetadata = requireHttpsMetadata;
-        }
 
         // Method.
         public async Task<DiscoveryDocumentResponse> GetDiscoveryDocumentAsync()
