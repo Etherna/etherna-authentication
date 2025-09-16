@@ -1,4 +1,4 @@
-﻿// Copyright 2021-present Etherna SA
+// Copyright 2021-present Etherna SA
 // This file is part of EthernaAuthentication.
 // 
 // EthernaAuthentication is free software: you can redistribute it and/or modify it under the terms of the
@@ -12,24 +12,15 @@
 // You should have received a copy of the GNU Lesser General Public License along with EthernaAuthentication.
 // If not, see <https://www.gnu.org/licenses/>.
 
-using System.Threading.Tasks;
-
 namespace Etherna.Authentication
 {
-    public interface IEthernaOpenIdConnectClient
+    public static class EthernaScopes
     {
-        Task<string> GetClientIdAsync();
-        Task<string> GetEtherAddressAsync();
-        Task<string[]> GetEtherPrevAddressesAsync();
-        Task<string[]> GetRolesAsync();
-        Task<string> GetUserIdAsync();
-        Task<string> GetUsernameAsync();
-        Task<bool> HasScopesAsync(params string[] scopes);
-        Task<string?> TryGetClientIdAsync();
-        Task<string?> TryGetEtherAddressAsync();
-        Task<string[]?> TryGetEtherPrevAddressesAsync();
-        Task<string[]?> TryGetRolesAsync();
-        Task<string?> TryGetUserIdAsync();
-        Task<string?> TryGetUsernameAsync();
+        public const string UserApiCreditScopeName = "userApi.credit";
+        public const string UserApiGatewayScopeName = "userApi.gateway";
+        public const string UserApiIndexScopeName = "userApi.index";
+        public const string UserApiSsoScopeName = "userApi.sso";
+        
+        public const string UserEtherAccountsScopeName = "ether_accounts";
     }
 }

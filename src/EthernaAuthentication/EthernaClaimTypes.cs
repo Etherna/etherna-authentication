@@ -27,6 +27,7 @@ namespace Etherna.Authentication
         public const string Role_Dotnet = ClaimTypes.Role;
         public const string Role_IdentityModel = JwtClaimTypes.Role;
 #pragma warning restore CA1707
+        public const string Scope = JwtClaimTypes.Scope;
         public const string UserId = JwtClaimTypes.Subject;
         public const string Username = "preferred_username";
     }
