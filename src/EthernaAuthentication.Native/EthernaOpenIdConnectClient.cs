@@ -69,7 +69,7 @@ namespace Etherna.Authentication.Native
             }
             catch (InvalidOperationException)
             {
-                return Array.Empty<Claim>();
+                return [];
             }
         }
 

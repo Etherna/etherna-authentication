@@ -35,75 +35,87 @@ namespace Etherna.Authentication
         // Methods.
         public async Task<string> GetClientIdAsync()
         {
-            var claim = await GetClaimAsync(EthernaClaimTypes.ClientId).ConfigureAwait(false);
+            var claim = (await GetClaimAsync(EthernaClaimTypes.ClientId).ConfigureAwait(false)).First();
             return claim.Value;
         }
 
         public async Task<string> GetEtherAddressAsync()
         {
-            var claim = await GetClaimAsync(EthernaClaimTypes.EtherAddress).ConfigureAwait(false);
+            var claim = (await GetClaimAsync(EthernaClaimTypes.EtherAddress).ConfigureAwait(false)).First();
             return claim.Value;
         }
 
         public async Task<string[]> GetEtherPrevAddressesAsync()
         {
-            var claim = await GetClaimAsync(EthernaClaimTypes.EtherPreviousAddresses).ConfigureAwait(false);
+            var claim = (await GetClaimAsync(EthernaClaimTypes.EtherPreviousAddresses).ConfigureAwait(false)).First();
             return JsonSerializer.Deserialize(claim.Value, ClaimJsonSerializerContext.Default.StringArray) ?? [];
         }
 
         public async Task<string[]> GetRolesAsync()
         {
-            var claim = await TryGetClaimAsync(EthernaClaimTypes.Role_Dotnet).ConfigureAwait(false) ??
-                        await GetClaimAsync(EthernaClaimTypes.Role_IdentityModel).ConfigureAwait(false);
-            return [claim.Value];
+            var claims = await TryGetClaimAsync(EthernaClaimTypes.Role_Dotnet).ConfigureAwait(false);
+            if (claims.Length == 0)
+                claims = await GetClaimAsync(EthernaClaimTypes.Role_IdentityModel).ConfigureAwait(false);
+
+            return claims.Select(c => c.Value).ToArray();
         }
 
         public async Task<string> GetUserIdAsync()
         {
-            var claim = await GetClaimAsync(EthernaClaimTypes.UserId).ConfigureAwait(false);
+            var claim = (await GetClaimAsync(EthernaClaimTypes.UserId).ConfigureAwait(false)).First();
             return claim.Value;
         }
 
         public async Task<string> GetUsernameAsync()
         {
-            var claim = await GetClaimAsync(EthernaClaimTypes.Username).ConfigureAwait(false);
+            var claim = (await GetClaimAsync(EthernaClaimTypes.Username).ConfigureAwait(false)).First();
             return claim.Value;
+        }
+
+        public async Task<bool> HasScopesAsync(params string[] scopes)
+        {
+            var claims = await TryGetClaimAsync(EthernaClaimTypes.Scope).ConfigureAwait(false);
+            return new HashSet<string>(claims.Select(c => c.Value)).IsSupersetOf(scopes);
         }
 
         public async Task<string?> TryGetClientIdAsync()
         {
-            var claim = await TryGetClaimAsync(EthernaClaimTypes.ClientId).ConfigureAwait(false);
+            var claim = (await TryGetClaimAsync(EthernaClaimTypes.ClientId).ConfigureAwait(false)).FirstOrDefault();
             return claim?.Value;
         }
 
         public async Task<string?> TryGetEtherAddressAsync()
         {
-            var claim = await TryGetClaimAsync(EthernaClaimTypes.EtherAddress).ConfigureAwait(false);
+            var claim = (await TryGetClaimAsync(EthernaClaimTypes.EtherAddress).ConfigureAwait(false)).FirstOrDefault();
             return claim?.Value;
         }
 
         public async Task<string[]?> TryGetEtherPrevAddressesAsync()
         {
-            var claim = await TryGetClaimAsync(EthernaClaimTypes.EtherPreviousAddresses).ConfigureAwait(false);
+            var claim = (await TryGetClaimAsync(EthernaClaimTypes.EtherPreviousAddresses).ConfigureAwait(false)).FirstOrDefault();
             return claim is null ? null : JsonSerializer.Deserialize(claim.Value, ClaimJsonSerializerContext.Default.StringArray);
         }
 
         public async Task<string[]?> TryGetRolesAsync()
         {
-            var claim = await TryGetClaimAsync(EthernaClaimTypes.Role_Dotnet).ConfigureAwait(false) ??
-                        await TryGetClaimAsync(EthernaClaimTypes.Role_IdentityModel).ConfigureAwait(false);
-            return claim is null ? null : [claim.Value];
+            var claims = await TryGetClaimAsync(EthernaClaimTypes.Role_Dotnet).ConfigureAwait(false);
+            if (claims.Length == 0)
+                claims = await TryGetClaimAsync(EthernaClaimTypes.Role_IdentityModel).ConfigureAwait(false);
+
+            if (claims.Length == 0)
+                return null;
+            return claims.Select(c => c.Value).ToArray();
         }
 
         public async Task<string?> TryGetUserIdAsync()
         {
-            var claim = await TryGetClaimAsync(EthernaClaimTypes.UserId).ConfigureAwait(false);
+            var claim = (await TryGetClaimAsync(EthernaClaimTypes.UserId).ConfigureAwait(false)).FirstOrDefault();
             return claim?.Value;
         }
 
         public async Task<string?> TryGetUsernameAsync()
         {
-            var claim = await TryGetClaimAsync(EthernaClaimTypes.Username).ConfigureAwait(false);
+            var claim = (await TryGetClaimAsync(EthernaClaimTypes.Username).ConfigureAwait(false)).FirstOrDefault();
             return claim?.Value;
         }
 
@@ -114,10 +126,12 @@ namespace Etherna.Authentication
         protected abstract Task<string?> TryGetUserAccessTokenAsync();
 
         // Helpers.
-        private async Task<Claim> GetClaimAsync(string claimType)
+        private async Task<Claim[]> GetClaimAsync(string claimType)
         {
-            var claim = await TryGetClaimAsync(claimType).ConfigureAwait(false);
-            return claim ?? throw new KeyNotFoundException($"Claim type {claimType} not found");
+            var claims = await TryGetClaimAsync(claimType).ConfigureAwait(false);
+            if (claims.Length == 0)
+                throw new KeyNotFoundException($"Claim type {claimType} not found");
+            return claims;
         }
 
         private async Task<IEnumerable<Claim>> GetUserInfoAsync(string accessToken)
@@ -143,20 +157,20 @@ namespace Etherna.Authentication
             return userInfo;
         }
 
-        private async Task<Claim?> TryGetClaimAsync(string claimType)
+        private async Task<Claim[]> TryGetClaimAsync(string claimType)
         {
             var userClaims = TryGetCurrentUserClaims();
-            var claim = userClaims.FirstOrDefault(c => c.Type == claimType);
+            var claims = userClaims.Where(c => c.Type == claimType).ToArray();
 
-            if (claim is not null)
-                return claim;
+            if (claims.Length != 0)
+                return claims;
 
             var accessToken = await TryGetUserAccessTokenAsync().ConfigureAwait(false);
             if (accessToken is null)
-                return null;
+                return [];
 
             var userInfo = await GetUserInfoAsync(accessToken).ConfigureAwait(false);
-            return userInfo.FirstOrDefault(c => c.Type == claimType);
+            return userInfo.Where(c => c.Type == claimType).ToArray();
         }
     }
 }
