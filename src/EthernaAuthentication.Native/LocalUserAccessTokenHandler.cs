@@ -21,25 +21,16 @@ using System.Threading.Tasks;
 
 namespace Etherna.Authentication.Native
 {
-    public class LocalUserAccessTokenHandler : AccessTokenHandler
+    public class LocalUserAccessTokenHandler(
+        IDPoPProofService dPoPProofService,
+        IDPoPNonceStore dPoPNonceStore,
+        IEthernaSignInService ethernaSignInService,
+        ILogger<LocalUserAccessTokenHandler> logger,
+        IUserTokenManagementService userTokenManagementService,
+        UserTokenRequestParameters? parameters = null)
+        : AccessTokenHandler(dPoPProofService, dPoPNonceStore, logger)
     {
-        private readonly UserTokenRequestParameters parameters;
-        private readonly IEthernaSignInService ethernaSignInService;
-        private readonly IUserTokenManagementService userTokenManagementService;
-
-        public LocalUserAccessTokenHandler(
-            IDPoPProofService dPoPProofService,
-            IDPoPNonceStore dPoPNonceStore,
-            IEthernaSignInService ethernaSignInService,
-            ILogger<LocalUserAccessTokenHandler> logger,
-            IUserTokenManagementService userTokenManagementService,
-            UserTokenRequestParameters? parameters = null)
-            : base(dPoPProofService, dPoPNonceStore, logger)
-        {
-            this.ethernaSignInService = ethernaSignInService;
-            this.userTokenManagementService = userTokenManagementService;
-            this.parameters = parameters ?? new UserTokenRequestParameters();
-        }
+        private readonly UserTokenRequestParameters parameters = parameters ?? new UserTokenRequestParameters();
 
         protected override async Task<ClientCredentialsToken> GetAccessTokenAsync(
             bool forceRenewal,

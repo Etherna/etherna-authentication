@@ -15,6 +15,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading.Tasks;
 
@@ -32,7 +33,7 @@ namespace Etherna.Authentication.Native.CodeFlow
         // Fields.
         private bool isDisposed;
 
-        private readonly IWebHost host;
+        private readonly IHost host;
         private readonly TaskCompletionSource<string> _source = new();
         private readonly string _url;
         private readonly string failureContentType;
@@ -60,10 +61,14 @@ namespace Etherna.Authentication.Native.CodeFlow
 
             _url = $"http://127.0.0.1:{port}/{path}";
 
-            host = new WebHostBuilder()
-                .UseKestrel()
-                .UseUrls(_url)
-                .Configure(Configure)
+            host = new HostBuilder()
+                .ConfigureWebHost(webHostBuilder =>
+                {
+                    webHostBuilder
+                        .UseKestrel()
+                        .UseUrls(_url)
+                        .Configure(Configure);
+                })
                 .Build();
             host.Start();
         }
