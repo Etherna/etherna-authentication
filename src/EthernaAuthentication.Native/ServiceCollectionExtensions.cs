@@ -12,11 +12,14 @@
 // You should have received a copy of the GNU Lesser General Public License along with EthernaAuthentication.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Duende.AccessTokenManagement;
+using Duende.AccessTokenManagement.DPoP;
 using Duende.AccessTokenManagement.OpenIdConnect;
 using Etherna.Authentication.Native.CodeFlow;
 using Etherna.Authentication.Native.PasswordFlow;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -54,6 +57,7 @@ namespace Etherna.Authentication.Native
                 options.ApiKey = apiKey;
             });
             services.AddSingleton<IEthernaSignInService, EthernaApiKeySignInService>();
+            services.AddSingleton<IUserAccessor, EthernaApiKeySignInService>();
         }
 
         public static void AddEthernaCodeOidcClient(
@@ -89,6 +93,7 @@ namespace Etherna.Authentication.Native
                 options.ReturnUrlPort = returnUrlPort;
             });
             services.AddSingleton<IEthernaSignInService, EthernaCodeSignInService>();
+            services.AddSingleton<IUserAccessor, EthernaCodeSignInService>();
         }
 
         // Helpers.
@@ -99,8 +104,8 @@ namespace Etherna.Authentication.Native
             Action<HttpClient>? configureManagedHttpClient)
         {
             // Check conditions.
-            ArgumentNullException.ThrowIfNull(services, nameof(services));
-            ArgumentNullException.ThrowIfNull(configureOidcOptions, nameof(configureOidcOptions));
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(configureOidcOptions);
 
             var options = new OpenIdConnectOptions();
             configureOidcOptions(options);
@@ -108,8 +113,8 @@ namespace Etherna.Authentication.Native
             if (options.Authority is null)
                 throw new InvalidOperationException("Authority can't be null");
 
-            // Register memory cache to keep tokens.
-            services.AddDistributedMemoryCache();
+            // Register cache to keep tokens.
+            services.AddHybridCache();
             services.AddSingleton<IUserTokenStore, LocalUserTokenStore>();
 
             // Add Etherna OpenID Connect.
@@ -129,9 +134,13 @@ namespace Etherna.Authentication.Native
                 var httpClientBuilder = configureManagedHttpClient is null ?
                     services.AddHttpClient(managedHttpClientName) :
                     services.AddHttpClient(managedHttpClientName, configureManagedHttpClient);
-
-                services.AddSingleton<LocalUserAccessTokenHandler>();
-                httpClientBuilder.AddHttpMessageHandler<LocalUserAccessTokenHandler>();
+                
+                services.AddTransient<LocalUserAccessTokenRetriever>();
+                httpClientBuilder.AddHttpMessageHandler(provider => new AccessTokenRequestHandler(
+                    tokenRetriever: provider.GetRequiredService<LocalUserAccessTokenRetriever>(),
+                    dPoPNonceStore: provider.GetRequiredService<IDPoPNonceStore>(),
+                    dPoPProofService: provider.GetRequiredService<IDPoPProofService>(),
+                    logger: provider.GetRequiredService<ILogger<AccessTokenRequestHandler>>()));
             }
         }
     }

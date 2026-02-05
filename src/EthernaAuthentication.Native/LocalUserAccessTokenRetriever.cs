@@ -13,43 +13,41 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 using Duende.AccessTokenManagement;
+using Duende.AccessTokenManagement.DPoP;
 using Duende.AccessTokenManagement.OpenIdConnect;
-using Microsoft.Extensions.Logging;
-using System;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Etherna.Authentication.Native
 {
-    public class LocalUserAccessTokenHandler(
-        IDPoPProofService dPoPProofService,
-        IDPoPNonceStore dPoPNonceStore,
-        IEthernaSignInService ethernaSignInService,
-        ILogger<LocalUserAccessTokenHandler> logger,
-        IUserTokenManagementService userTokenManagementService,
+    public class LocalUserAccessTokenRetriever(
+        IUserAccessor userAccessor,
+        IUserTokenManager userTokenManager,
         UserTokenRequestParameters? parameters = null)
-        : AccessTokenHandler(dPoPProofService, dPoPNonceStore, logger)
+        : AccessTokenRequestHandler.ITokenRetriever
     {
         private readonly UserTokenRequestParameters parameters = parameters ?? new UserTokenRequestParameters();
 
-        protected override async Task<ClientCredentialsToken> GetAccessTokenAsync(
-            bool forceRenewal,
-            CancellationToken cancellationToken)
+        public async Task<TokenResult<AccessTokenRequestHandler.IToken>> GetTokenAsync(
+            HttpRequestMessage request,
+            CancellationToken ct)
         {
-            if (!ethernaSignInService.IsAuthenticated)
-                throw new InvalidOperationException("User is not authenticated");
-
-            return await userTokenManagementService.GetAccessTokenAsync(
-                ethernaSignInService.CurrentUser!,
+            var tokenResult = await userTokenManager.GetAccessTokenAsync(
+                await userAccessor.GetCurrentUserAsync(ct).ConfigureAwait(false),
                 new UserTokenRequestParameters
                 {
                     SignInScheme = parameters.SignInScheme,
                     ChallengeScheme = parameters.ChallengeScheme,
                     Resource = parameters.Resource,
                     Context = parameters.Context,
-                    ForceRenewal = forceRenewal,
+                    ForceTokenRenewal = request.GetForceRenewal(),
                 },
-                cancellationToken).ConfigureAwait(false);
+                ct).ConfigureAwait(false);
+
+            return tokenResult.Succeeded
+                ? TokenResult.Success<AccessTokenRequestHandler.IToken>(tokenResult.Token)
+                : tokenResult.FailedResult;
         }
     }
 }
