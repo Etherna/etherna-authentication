@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with EthernaAuthentication.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Duende.AccessTokenManagement;
 using Duende.AccessTokenManagement.OpenIdConnect;
 using IdentityModel;
 using IdentityModel.Client;
@@ -22,11 +23,12 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Etherna.Authentication.Native.PasswordFlow
 {
-    public class EthernaApiKeySignInService : IEthernaSignInService
+    public class EthernaApiKeySignInService : IEthernaSignInService, IUserAccessor
     {
         // Fields.
         private readonly IOpenIdConnectConfigurationService openIdConnectConfigurationService;
@@ -41,8 +43,8 @@ namespace Etherna.Authentication.Native.PasswordFlow
             IOptions<EthernaApiKeySignInServiceOptions> signInServiceOptions,
             IUserTokenStore userTokenStore)
         {
-            ArgumentNullException.ThrowIfNull(openIdConnectOptionsMonitor, nameof(openIdConnectOptionsMonitor));
-            ArgumentNullException.ThrowIfNull(signInServiceOptions, nameof(signInServiceOptions));
+            ArgumentNullException.ThrowIfNull(openIdConnectOptionsMonitor);
+            ArgumentNullException.ThrowIfNull(signInServiceOptions);
 
             this.openIdConnectConfigurationService = openIdConnectConfigurationService;
             openIdConnectOptions = openIdConnectOptionsMonitor.Get(
@@ -56,6 +58,9 @@ namespace Etherna.Authentication.Native.PasswordFlow
         public bool IsAuthenticated => CurrentUser != null;
 
         // Methods.
+        public Task<ClaimsPrincipal> GetCurrentUserAsync(CancellationToken ct = new()) =>
+            Task.FromResult(CurrentUser ?? new ClaimsPrincipal());
+        
         public async Task SignInAsync()
         {
             // Check conditions.
@@ -69,15 +74,15 @@ namespace Etherna.Authentication.Native.PasswordFlow
 
             // Get oidc config.
             var oidcConfig = await openIdConnectConfigurationService.GetOpenIdConnectConfigurationAsync(
-                signInServiceOptions.AuthenticationSchemeName).ConfigureAwait(false);
+                Scheme.Parse(signInServiceOptions.AuthenticationSchemeName)).ConfigureAwait(false);
 
             // Perform authentication request.
             using var client = new HttpClient();
             using var request = new PasswordTokenRequest
             {
-                Address = oidcConfig.TokenEndpoint,
+                Address = oidcConfig.TokenEndpoint.AbsoluteUri,
 
-                ClientId = oidcConfig.ClientId!,
+                ClientId = oidcConfig.ClientId,
                 Scope = string.Join(' ', openIdConnectOptions.Scope),
 
                 UserName = splitApiKey[0],
@@ -92,17 +97,17 @@ namespace Etherna.Authentication.Native.PasswordFlow
             var token = new JwtSecurityTokenHandler().ReadJwtToken(tokenResponse.AccessToken);
 
             // Store login result.
-            CurrentUser = Principal.Create(oidcConfig.Authority!, token.Claims.ToArray());
+            CurrentUser = Principal.Create(oidcConfig.TokenEndpoint.Authority, token.Claims.ToArray());
             await userTokenStore.StoreTokenAsync(
                 CurrentUser,
                 new UserToken
                 {
-                    AccessToken = tokenResponse.AccessToken,
-                    AccessTokenType = tokenResponse.TokenType,
-                    Error = tokenResponse.Error,
+                    AccessToken = AccessToken.Parse(tokenResponse.AccessToken!),
+                    AccessTokenType = AccessTokenType.Parse(tokenResponse.TokenType!),
+                    ClientId = ClientId.Parse(oidcConfig.ClientId),
                     Expiration = DateTimeOffset.Now.AddSeconds(tokenResponse.ExpiresIn),
-                    RefreshToken = tokenResponse.RefreshToken,
-                    Scope = tokenResponse.Scope
+                    RefreshToken = RefreshToken.Parse(tokenResponse.RefreshToken!),
+                    Scope = Scope.Parse(tokenResponse.Scope!)
                 }).ConfigureAwait(false);
         }
     }

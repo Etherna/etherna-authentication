@@ -20,23 +20,12 @@ using System.Threading.Tasks;
 
 namespace Etherna.Authentication.Native
 {
-    public class EthernaOpenIdConnectClient : EthernaOpenIdConnectClientBase
+    public class EthernaOpenIdConnectClient(
+        IDiscoveryDocumentService discoveryDocumentService,
+        IEthernaSignInService ethernaSignInService,
+        IUserTokenManager userTokenManagementService)
+        : EthernaOpenIdConnectClientBase(discoveryDocumentService)
     {
-        // Fields.
-        private readonly IEthernaSignInService ethernaSignInService;
-        private readonly IUserTokenManagementService userTokenManagementService;
-
-        // Constructor.
-        public EthernaOpenIdConnectClient(
-            IDiscoveryDocumentService discoveryDocumentService,
-            IEthernaSignInService ethernaSignInService,
-            IUserTokenManagementService userTokenManagementService)
-            : base(discoveryDocumentService)
-        {
-            this.ethernaSignInService = ethernaSignInService;
-            this.userTokenManagementService = userTokenManagementService;
-        }
-
         // Protected methods.
         protected override IEnumerable<Claim> GetCurrentUserClaims()
         {
@@ -52,13 +41,13 @@ namespace Etherna.Authentication.Native
                 throw new InvalidOperationException("User is not authenticated");
 
             var userToken = await userTokenManagementService.GetAccessTokenAsync(ethernaSignInService.CurrentUser!).ConfigureAwait(false);
-            if (userToken.IsError)
-                throw new InvalidOperationException($"Invalid token with error: {userToken.Error}");
+            if (!userToken.Succeeded)
+                throw new InvalidOperationException($"Invalid token with error: {userToken.FailedResult.Error}");
 
-            if (string.IsNullOrWhiteSpace(userToken.AccessToken))
+            if (string.IsNullOrWhiteSpace(userToken.Token.AccessToken))
                 throw new InvalidOperationException("Invalid empty access token");
 
-            return userToken.AccessToken;
+            return userToken.Token.AccessToken;
         }
 
         protected override IEnumerable<Claim> TryGetCurrentUserClaims()

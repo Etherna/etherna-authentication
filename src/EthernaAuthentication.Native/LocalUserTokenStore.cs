@@ -12,10 +12,12 @@
 // You should have received a copy of the GNU Lesser General Public License along with EthernaAuthentication.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Duende.AccessTokenManagement;
 using Duende.AccessTokenManagement.OpenIdConnect;
 using System;
 using System.Collections.Concurrent;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Etherna.Authentication.Native
@@ -23,12 +25,15 @@ namespace Etherna.Authentication.Native
     public sealed class LocalUserTokenStore : IUserTokenStore
     {
         // Fields.
-        private readonly ConcurrentDictionary<string, UserToken> tokenDictionary = new();
+        private readonly ConcurrentDictionary<string, TokenForParameters> tokenDictionary = new();
 
         // Methods.
-        public Task ClearTokenAsync(ClaimsPrincipal user, UserTokenRequestParameters? parameters = null)
+        public Task ClearTokenAsync(
+            ClaimsPrincipal user,
+            UserTokenRequestParameters? parameters = null,
+            CancellationToken ct = new())
         {
-            ArgumentNullException.ThrowIfNull(user, nameof(user));
+            ArgumentNullException.ThrowIfNull(user);
 
             var sub = user.FindFirst("sub")?.Value ?? throw new InvalidOperationException("no sub claim");
 
@@ -36,24 +41,37 @@ namespace Etherna.Authentication.Native
             return Task.CompletedTask;
         }
 
-        public Task<UserToken> GetTokenAsync(ClaimsPrincipal user, UserTokenRequestParameters? parameters = null)
+        public Task<TokenResult<TokenForParameters>> GetTokenAsync(
+            ClaimsPrincipal user,
+            UserTokenRequestParameters? parameters = null,
+            CancellationToken ct = new())
         {
-            ArgumentNullException.ThrowIfNull(user, nameof(user));
+            ArgumentNullException.ThrowIfNull(user);
 
             var sub = user.FindFirst("sub")?.Value ?? throw new InvalidOperationException("no sub claim");
 
             if (tokenDictionary.TryGetValue(sub, out var value))
-                return Task.FromResult(value);
+                return Task.FromResult(TokenResult.Success(value));
 
-            return Task.FromResult(new UserToken { Error = "not found" });
+            return Task.FromResult((TokenResult<TokenForParameters>)TokenResult.Failure("not found"));
         }
 
-        public Task StoreTokenAsync(ClaimsPrincipal user, UserToken token, UserTokenRequestParameters? parameters = null)
+        public Task StoreTokenAsync(
+            ClaimsPrincipal user,
+            UserToken token,
+            UserTokenRequestParameters? parameters = null,
+            CancellationToken ct = new())
         {
-            ArgumentNullException.ThrowIfNull(user, nameof(user));
+            ArgumentNullException.ThrowIfNull(token);
+            ArgumentNullException.ThrowIfNull(user);
 
             var sub = user.FindFirst("sub")?.Value ?? throw new InvalidOperationException("no sub claim");
-            tokenDictionary[sub] = token;
+            tokenDictionary[sub] = new TokenForParameters(
+                token,
+                token.RefreshToken == null
+                    ? null
+                    : new UserRefreshToken(token.RefreshToken.Value, token.DPoPJsonWebKey)
+            );
 
             return Task.CompletedTask;
         }

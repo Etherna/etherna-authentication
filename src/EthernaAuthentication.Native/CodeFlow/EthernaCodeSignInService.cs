@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with EthernaAuthentication.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Duende.AccessTokenManagement;
 using Duende.AccessTokenManagement.OpenIdConnect;
 using IdentityModel.OidcClient;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -19,11 +20,12 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Net.Http;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Etherna.Authentication.Native.CodeFlow
 {
-    public class EthernaCodeSignInService : IEthernaSignInService
+    public class EthernaCodeSignInService : IEthernaSignInService, IUserAccessor
     {
         // Fields.
         private readonly OpenIdConnectOptions openIdConnectOptions;
@@ -36,8 +38,8 @@ namespace Etherna.Authentication.Native.CodeFlow
             IOptions<EthernaCodeSignInServiceOptions> signInServiceOptions,
             IUserTokenStore userTokenStore)
         {
-            ArgumentNullException.ThrowIfNull(openIdConnectOptionsMonitor, nameof(openIdConnectOptionsMonitor));
-            ArgumentNullException.ThrowIfNull(signInServiceOptions, nameof(signInServiceOptions));
+            ArgumentNullException.ThrowIfNull(openIdConnectOptionsMonitor);
+            ArgumentNullException.ThrowIfNull(signInServiceOptions);
 
             openIdConnectOptions = openIdConnectOptionsMonitor.Get(
                 signInServiceOptions.Value.AuthenticationSchemeName);
@@ -50,6 +52,9 @@ namespace Etherna.Authentication.Native.CodeFlow
         public bool IsAuthenticated => CurrentUser != null;
 
         // Methods.
+        public Task<ClaimsPrincipal> GetCurrentUserAsync(CancellationToken ct = new()) =>
+            Task.FromResult(CurrentUser ?? new ClaimsPrincipal());
+        
         public async Task SignInAsync()
         {
             // create a redirect URI using an available port on the loopback address.
@@ -80,11 +85,12 @@ namespace Etherna.Authentication.Native.CodeFlow
                 loginResult.User,
                 new UserToken
                 {
-                    AccessToken = loginResult.AccessToken,
-                    Error = loginResult.Error,
+                    ClientId = ClientId.Parse(openIdConnectOptions.ClientId!),
+                    AccessTokenType = AccessTokenType.Parse("Bearer"),
+                    AccessToken = AccessToken.Parse(loginResult.AccessToken),
                     Expiration = loginResult.AccessTokenExpiration,
-                    RefreshToken = loginResult.RefreshToken,
-                    Scope = options.Scope
+                    RefreshToken = RefreshToken.Parse(loginResult.RefreshToken),
+                    Scope = Scope.Parse(options.Scope)
                 }).ConfigureAwait(false);
         }
     }
