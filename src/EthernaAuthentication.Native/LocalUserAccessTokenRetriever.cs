@@ -33,8 +33,9 @@ namespace Etherna.Authentication.Native
             HttpRequestMessage request,
             CancellationToken ct)
         {
+            var currentUser = await userAccessor.GetCurrentUserAsync(ct).ConfigureAwait(false);
             var tokenResult = await userTokenManager.GetAccessTokenAsync(
-                await userAccessor.GetCurrentUserAsync(ct).ConfigureAwait(false),
+                currentUser,
                 new UserTokenRequestParameters
                 {
                     SignInScheme = parameters.SignInScheme,

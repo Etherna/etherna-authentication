@@ -57,7 +57,8 @@ namespace Etherna.Authentication.Native
                 options.ApiKey = apiKey;
             });
             services.AddSingleton<IEthernaSignInService, EthernaApiKeySignInService>();
-            services.AddSingleton<IUserAccessor, EthernaApiKeySignInService>();
+            services.AddSingleton<IUserAccessor, EthernaApiKeySignInService>(provider =>
+                (EthernaApiKeySignInService)provider.GetRequiredService<IEthernaSignInService>());
         }
 
         public static void AddEthernaCodeOidcClient(
@@ -93,7 +94,8 @@ namespace Etherna.Authentication.Native
                 options.ReturnUrlPort = returnUrlPort;
             });
             services.AddSingleton<IEthernaSignInService, EthernaCodeSignInService>();
-            services.AddSingleton<IUserAccessor, EthernaCodeSignInService>();
+            services.AddSingleton<IUserAccessor, EthernaCodeSignInService>(provider =>
+                (EthernaCodeSignInService)provider.GetRequiredService<IEthernaSignInService>());
         }
 
         // Helpers.
