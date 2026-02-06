@@ -57,8 +57,8 @@ namespace Etherna.Authentication.Native.CodeFlow
         
         public async Task SignInAsync()
         {
-            // create a redirect URI using an available port on the loopback address.
-            // requires the OP to allow random ports on 127.0.0.1 - otherwise set a static port
+            // Create a redirect URI using an available port on the loopback address.
+            // Requires the OP to allow random ports on 127.0.0.1 - otherwise set a static port.
             var browser = new SystemBrowser(signInServiceOptions.ReturnUrlPort);
             var redirectUri = $"http://127.0.0.1:{browser.Port}";
 
@@ -75,6 +75,11 @@ namespace Etherna.Authentication.Native.CodeFlow
             };
 
             var oidcClient = new OidcClient(options);
+            
+            // Mute environment warnings in console opening browser.
+            Environment.SetEnvironmentVariable("QT_LOGGING_RULES", "qt.qpa.*=false"); //QT warnings
+            
+            // Open browser.
             var loginResult = await oidcClient.LoginAsync(new LoginRequest()).ConfigureAwait(false);
             if (loginResult.IsError)
                 throw new InvalidOperationException($"Error during authentication: {loginResult.Error}");
