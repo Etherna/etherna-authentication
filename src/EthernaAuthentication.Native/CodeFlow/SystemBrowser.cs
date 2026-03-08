@@ -58,7 +58,7 @@ namespace Etherna.Authentication.Native.CodeFlow
         // Methods.
         public async Task<BrowserResult> InvokeAsync(BrowserOptions options, CancellationToken cancellationToken)
         {
-            ArgumentNullException.ThrowIfNull(options, nameof(options));
+            ArgumentNullException.ThrowIfNull(options);
 
             using var listener = new LoopbackHttpListener(
                 Port,
