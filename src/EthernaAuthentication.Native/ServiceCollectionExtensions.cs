@@ -44,7 +44,7 @@ namespace Etherna.Authentication.Native
                     options.ClientId = "apiKeyClientId";
                     options.SaveTokens = true;
                     options.Scope.Add("offline_access");
-                    options.Scope.Add(EthernaScopes.UserEtherAccountsScopeName);
+                    options.Scope.Add(EthernaScopes.EtherAccounts);
                     foreach (var scope in scopes)
                         options.Scope.Add(scope);
                 },
@@ -81,7 +81,7 @@ namespace Etherna.Authentication.Native
                     options.ResponseType = "code";
                     options.SaveTokens = true;
                     options.Scope.Add("offline_access");
-                    options.Scope.Add(EthernaScopes.UserEtherAccountsScopeName);
+                    options.Scope.Add(EthernaScopes.EtherAccounts);
                     foreach (var scope in scopes)
                         options.Scope.Add(scope);
                 },
