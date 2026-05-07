@@ -27,24 +27,24 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Duende.AccessTokenManagement.OpenIdConnect" Version="4.1.1" />
-    <PackageReference Include="GitVersion.MsBuild" Version="6.5.1">
+    <PackageReference Include="Duende.AccessTokenManagement.OpenIdConnect" Version="4.2.0" />
+    <PackageReference Include="GitVersion.MsBuild" Version="6.7.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="IdentityModel.OidcClient" Version="6.0.0" />
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.102">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.203">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
   
   <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.15" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="10.0.7" />
   </ItemGroup>
 
   <ItemGroup>
