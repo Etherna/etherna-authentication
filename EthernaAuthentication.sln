@@ -24,6 +24,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EthernaAuthentication", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EthernaAuthentication.Native", "src\EthernaAuthentication.Native\EthernaAuthentication.Native.csproj", "{C994D539-C6B9-427A-83D4-333D240BFFB6}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EthernaAuthentication.ClientCredentials", "src\EthernaAuthentication.ClientCredentials\EthernaAuthentication.ClientCredentials.csproj", "{B4131406-A4F8-4205-906D-F8B9B393388F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +44,10 @@ Global
 		{C994D539-C6B9-427A-83D4-333D240BFFB6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C994D539-C6B9-427A-83D4-333D240BFFB6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C994D539-C6B9-427A-83D4-333D240BFFB6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4131406-A4F8-4205-906D-F8B9B393388F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4131406-A4F8-4205-906D-F8B9B393388F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4131406-A4F8-4205-906D-F8B9B393388F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4131406-A4F8-4205-906D-F8B9B393388F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -51,6 +57,7 @@ Global
 		{A7FDE183-EDB3-48F1-AD07-3CF202D863AA} = {712F092A-F6AE-4A7F-B65F-B5B0ADC9849D}
 		{C27B52F7-8AA5-488A-9756-C12BB57438AE} = {712F092A-F6AE-4A7F-B65F-B5B0ADC9849D}
 		{C994D539-C6B9-427A-83D4-333D240BFFB6} = {712F092A-F6AE-4A7F-B65F-B5B0ADC9849D}
+		{B4131406-A4F8-4205-906D-F8B9B393388F} = {712F092A-F6AE-4A7F-B65F-B5B0ADC9849D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BE970C17-E6A2-4FB9-8CF6-9BC80F2CAA4E}
