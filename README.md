@@ -14,6 +14,9 @@ Doesn't offer any default client registration method, or authentication flow.
 * **Etherna.Authentication.AspNetCore** implements authentication client with code flow for Asp.Net projects.  
 It provides support to registration with extension on Asp.Net `AuthenticationBuilder`.
 
+* **Etherna.Authentication.ClientCredentials** implements authentication with client credentials flow for .Net applications and services.  
+It permits to authenticate an application with its own identity, without any user interaction, and to consume `HttpClient` instances with automatic access token management. It doesn't depend on Asp.Net, so it can be used by any kind of application.
+
 * **Etherna.Authentication.Native** implement authentication client for native local applications.  
 It provides management of user's access tokens, and offers two different authentication flows:
   * *Code flow*: is the recomended flow to implement user authentication with native applications.  
