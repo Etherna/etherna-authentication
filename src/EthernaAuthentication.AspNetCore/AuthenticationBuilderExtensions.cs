@@ -12,10 +12,13 @@
 // You should have received a copy of the GNU Lesser General Public License along with EthernaAuthentication.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Duende.AccessTokenManagement;
+using Duende.AccessTokenManagement.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
 
 namespace Etherna.Authentication.AspNetCore
 {
@@ -30,6 +33,12 @@ namespace Etherna.Authentication.AspNetCore
         /// <para>
         /// Etherna authentication allows application users to sign in with their Etherna account.
         /// </para>
+        /// <para>
+        /// User access token management is registered automatically, bound to the registered scheme,
+        /// unless the application has already registered its own. Set <see cref="OpenIdConnectOptions.SaveTokens"/>
+        /// to <c>true</c> to consume managed user tokens, and request the <c>offline_access</c> scope
+        /// to permit token refresh.
+        /// </para>
         /// </summary>
         /// <param name="builder">The <see cref="AuthenticationBuilder"/>.</param>
         /// <param name="configureOptions">A delegate to configure <see cref="OpenIdConnectOptions"/>.</param>
@@ -42,6 +51,12 @@ namespace Etherna.Authentication.AspNetCore
         /// The default scheme is specified by <see cref="EthernaDefaults.AuthenticationScheme"/>.
         /// <para>
         /// Etherna authentication allows application users to sign in with their Etherna account.
+        /// </para>
+        /// <para>
+        /// User access token management is registered automatically, bound to the registered scheme,
+        /// unless the application has already registered its own. Set <see cref="OpenIdConnectOptions.SaveTokens"/>
+        /// to <c>true</c> to consume managed user tokens, and request the <c>offline_access</c> scope
+        /// to permit token refresh.
         /// </para>
         /// </summary>
         /// <param name="builder">The <see cref="AuthenticationBuilder"/>.</param>
@@ -56,6 +71,12 @@ namespace Etherna.Authentication.AspNetCore
         /// The default scheme is specified by <see cref="EthernaDefaults.AuthenticationScheme"/>.
         /// <para>
         /// Etherna authentication allows application users to sign in with their Etherna account.
+        /// </para>
+        /// <para>
+        /// User access token management is registered automatically, bound to the registered scheme,
+        /// unless the application has already registered its own. Set <see cref="OpenIdConnectOptions.SaveTokens"/>
+        /// to <c>true</c> to consume managed user tokens, and request the <c>offline_access</c> scope
+        /// to permit token refresh.
         /// </para>
         /// </summary>
         /// <param name="builder">The <see cref="AuthenticationBuilder"/>.</param>
@@ -80,6 +101,11 @@ namespace Etherna.Authentication.AspNetCore
             builder.Services.AddScoped<IEthernaOpenIdConnectClient, EthernaOpenIdConnectClient>(); //scoped because of user claims cache
 
             builder.AddOpenIdConnect(authenticationScheme, displayName, configureOptions);
+
+            // Add automatic user access token management, unless the application already registered it.
+            if (builder.Services.All(s => s.ServiceType != typeof(IUserTokenManager)))
+                builder.Services.AddOpenIdConnectAccessTokenManagement(tokenManagementOptions =>
+                    tokenManagementOptions.ChallengeScheme = Scheme.Parse(authenticationScheme));
 
             return builder;
         }
