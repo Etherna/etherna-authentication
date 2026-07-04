@@ -13,6 +13,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 using IdentityModel.Client;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -27,6 +28,14 @@ namespace Etherna.Authentication
         : IEthernaOpenIdConnectClient
     {
         // Fields.
+        //shared client: avoids per-call socket allocation, and bounds userinfo round-trips
+        //well below the 100s HttpClient default timeout. Recycling pooled connections keeps
+        //DNS changes visible despite the client living for the whole process.
+        private static readonly HttpClient userInfoHttpClient = new(
+            new SocketsHttpHandler { PooledConnectionLifetime = TimeSpan.FromMinutes(5) })
+        {
+            Timeout = TimeSpan.FromSeconds(15)
+        };
         private IEnumerable<Claim>? userInfo;
 
         // Properties.
@@ -142,13 +151,12 @@ namespace Etherna.Authentication
                 var discoveryDoc = await DiscoveryDocumentService.GetDiscoveryDocumentAsync().ConfigureAwait(false);
 
                 // Get user info.
-                using var httpClient = new HttpClient();
                 using var userInfoRequest = new UserInfoRequest
                 {
                     Address = discoveryDoc.UserInfoEndpoint,
                     Token = accessToken
                 };
-                var response = await httpClient.GetUserInfoAsync(userInfoRequest).ConfigureAwait(false);
+                var response = await userInfoHttpClient.GetUserInfoAsync(userInfoRequest).ConfigureAwait(false);
 
                 // Cache claims.
                 userInfo = response.Claims;
@@ -159,11 +167,17 @@ namespace Etherna.Authentication
 
         private async Task<Claim[]> TryGetClaimAsync(string claimType)
         {
-            var userClaims = TryGetCurrentUserClaims();
+            var userClaims = TryGetCurrentUserClaims().ToArray();
             var claims = userClaims.Where(c => c.Type == claimType).ToArray();
 
             if (claims.Length != 0)
                 return claims;
+
+            // Machine principals (e.g. from client credentials tokens) have no subject claim, and the
+            // userinfo endpoint requires one: all their claims already live in the token, don't search further.
+            // The subject can appear as "sub" or mapped to the .NET name identifier, depending on the handler.
+            if (!userClaims.Any(c => c.Type is EthernaClaimTypes.UserId or ClaimTypes.NameIdentifier))
+                return [];
 
             var accessToken = await TryGetUserAccessTokenAsync().ConfigureAwait(false);
             if (accessToken is null)
