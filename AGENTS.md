@@ -9,9 +9,10 @@ Projects multi-target **net9.0 and net10.0**. There is no `Directory.Build.props
 ```bash
 dotnet restore EthernaAuthentication.sln
 dotnet build EthernaAuthentication.sln -c Release    # compiles both target frameworks
+dotnet test EthernaAuthentication.sln -c Release     # runs test/EthernaAuthentication.UnitTest (xUnit)
 ```
 
-There is no test project and nothing to run: `dotnet build` (warnings-as-errors on every target framework) is the verification step. Because the libraries compile against the lowest target (`net9.0`), do not use APIs introduced only in net10.0 — it would pass on `net10.0` and fail the build on `net9.0`.
+There is nothing to run: `dotnet build` (warnings-as-errors on every target framework) plus `dotnet test` are the verification steps. Because the libraries compile against the lowest target (`net9.0`), do not use APIs introduced only in net10.0 — it would pass on `net10.0` and fail the build on `net9.0`.
 
 Versioning is automatic via **GitVersion** (`GitVersion.MsBuild` in every project, plus SourceLink). CI (`.github/workflows/`): pushes to `dev` and `release/**` build, test, pack and push unstable packages to MyGet; tags `v*.*.*` push stable packages to NuGet.
 

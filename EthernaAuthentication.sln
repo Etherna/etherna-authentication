@@ -8,9 +8,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		README.md = README.md
+		AGENTS.md = AGENTS.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{712F092A-F6AE-4A7F-B65F-B5B0ADC9849D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{CFC86E59-1F61-4FFD-87FD-F5CDD1C8CE83}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{31E1AD76-ECC3-4AF5-9200-A8E6DEE5DFDF}"
 	ProjectSection(SolutionItems) = preProject
@@ -25,6 +28,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EthernaAuthentication.Native", "src\EthernaAuthentication.Native\EthernaAuthentication.Native.csproj", "{C994D539-C6B9-427A-83D4-333D240BFFB6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EthernaAuthentication.ClientCredentials", "src\EthernaAuthentication.ClientCredentials\EthernaAuthentication.ClientCredentials.csproj", "{B4131406-A4F8-4205-906D-F8B9B393388F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EthernaAuthentication.UnitTest", "test\EthernaAuthentication.UnitTest\EthernaAuthentication.UnitTest.csproj", "{0F03E6A8-2E41-426F-8402-E676A972DDDF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,6 +53,10 @@ Global
 		{B4131406-A4F8-4205-906D-F8B9B393388F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B4131406-A4F8-4205-906D-F8B9B393388F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B4131406-A4F8-4205-906D-F8B9B393388F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F03E6A8-2E41-426F-8402-E676A972DDDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F03E6A8-2E41-426F-8402-E676A972DDDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F03E6A8-2E41-426F-8402-E676A972DDDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F03E6A8-2E41-426F-8402-E676A972DDDF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -58,6 +67,7 @@ Global
 		{C27B52F7-8AA5-488A-9756-C12BB57438AE} = {712F092A-F6AE-4A7F-B65F-B5B0ADC9849D}
 		{C994D539-C6B9-427A-83D4-333D240BFFB6} = {712F092A-F6AE-4A7F-B65F-B5B0ADC9849D}
 		{B4131406-A4F8-4205-906D-F8B9B393388F} = {712F092A-F6AE-4A7F-B65F-B5B0ADC9849D}
+		{0F03E6A8-2E41-426F-8402-E676A972DDDF} = {CFC86E59-1F61-4FFD-87FD-F5CDD1C8CE83}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BE970C17-E6A2-4FB9-8CF6-9BC80F2CAA4E}
