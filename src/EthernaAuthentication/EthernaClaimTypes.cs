@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with EthernaAuthentication.
 // If not, see <https://www.gnu.org/licenses/>.
 
-using IdentityModel;
+using Duende.IdentityModel;
 using System.Security.Claims;
 
 namespace Etherna.Authentication

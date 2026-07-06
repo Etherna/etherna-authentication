@@ -12,7 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with EthernaAuthentication.
 // If not, see <https://www.gnu.org/licenses/>.
 
-using IdentityModel.Client;
+using Duende.IdentityModel.Client;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
