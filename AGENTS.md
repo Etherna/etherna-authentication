@@ -9,8 +9,10 @@ Projects multi-target **net9.0 and net10.0**. There is no `Directory.Build.props
 ```bash
 dotnet restore EthernaAuthentication.sln
 dotnet build EthernaAuthentication.sln -c Release    # compiles both target frameworks
-dotnet test EthernaAuthentication.sln -c Release     # runs test/EthernaAuthentication.UnitTest (xUnit)
+dotnet test EthernaAuthentication.sln -c Release     # runs the test/ projects (xUnit)
 ```
+
+Every test project targets exactly one source project, named after it: `test/<SourceProject>.UnitTest` tests `src/<SourceProject>` and references only it. Never test a project from another project's test suite — when covering a source project that has no test project yet, create its own.
 
 There is nothing to run: `dotnet build` (warnings-as-errors on every target framework) plus `dotnet test` are the verification steps. Because the libraries compile against the lowest target (`net9.0`), do not use APIs introduced only in net10.0 — it would pass on `net10.0` and fail the build on `net9.0`.
 

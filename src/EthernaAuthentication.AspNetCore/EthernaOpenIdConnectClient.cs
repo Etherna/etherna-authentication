@@ -42,9 +42,17 @@ namespace Etherna.Authentication.AspNetCore
                 throw new InvalidOperationException("HttpContext can't be null");
 
             // Try with the managed user access token first, refreshed by token management when possible.
-            var managedToken = await httpContext.GetUserAccessTokenAsync().ConfigureAwait(false);
-            if (managedToken.Succeeded && !string.IsNullOrWhiteSpace(managedToken.Token.AccessToken))
-                return managedToken.Token.AccessToken;
+            // Token management can only refresh sessions carrying a refresh token, and logs an error
+            // when the session carries no tokens at all, like with cookie sessions signed in without
+            // an OpenId Connect handler: without a refresh token the raw session token is already the
+            // best available, so skip the managed lookup.
+            var refreshToken = await httpContext.GetTokenAsync("refresh_token").ConfigureAwait(false);
+            if (!string.IsNullOrEmpty(refreshToken))
+            {
+                var managedToken = await httpContext.GetUserAccessTokenAsync().ConfigureAwait(false);
+                if (managedToken.Succeeded && !string.IsNullOrWhiteSpace(managedToken.Token.AccessToken))
+                    return managedToken.Token.AccessToken;
+            }
 
             // Fall back on the raw token from the authentication session.
             // This is the case of requests authenticated with a plain bearer token, without a managed login session.
