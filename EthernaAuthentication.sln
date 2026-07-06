@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EthernaAuthentication.AspNe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EthernaAuthentication.AotCompatibility", "test\EthernaAuthentication.AotCompatibility\EthernaAuthentication.AotCompatibility.csproj", "{753809F6-F5B1-4C68-9202-7E2A5E1B0959}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EthernaAuthentication.Native.UnitTest", "test\EthernaAuthentication.Native.UnitTest\EthernaAuthentication.Native.UnitTest.csproj", "{342E1446-51B5-47E7-A5DD-B6ECBD5134B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -129,6 +131,18 @@ Global
 		{753809F6-F5B1-4C68-9202-7E2A5E1B0959}.Release|x64.Build.0 = Release|Any CPU
 		{753809F6-F5B1-4C68-9202-7E2A5E1B0959}.Release|x86.ActiveCfg = Release|Any CPU
 		{753809F6-F5B1-4C68-9202-7E2A5E1B0959}.Release|x86.Build.0 = Release|Any CPU
+		{342E1446-51B5-47E7-A5DD-B6ECBD5134B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{342E1446-51B5-47E7-A5DD-B6ECBD5134B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{342E1446-51B5-47E7-A5DD-B6ECBD5134B1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{342E1446-51B5-47E7-A5DD-B6ECBD5134B1}.Debug|x64.Build.0 = Debug|Any CPU
+		{342E1446-51B5-47E7-A5DD-B6ECBD5134B1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{342E1446-51B5-47E7-A5DD-B6ECBD5134B1}.Debug|x86.Build.0 = Debug|Any CPU
+		{342E1446-51B5-47E7-A5DD-B6ECBD5134B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{342E1446-51B5-47E7-A5DD-B6ECBD5134B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{342E1446-51B5-47E7-A5DD-B6ECBD5134B1}.Release|x64.ActiveCfg = Release|Any CPU
+		{342E1446-51B5-47E7-A5DD-B6ECBD5134B1}.Release|x64.Build.0 = Release|Any CPU
+		{342E1446-51B5-47E7-A5DD-B6ECBD5134B1}.Release|x86.ActiveCfg = Release|Any CPU
+		{342E1446-51B5-47E7-A5DD-B6ECBD5134B1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -142,6 +156,7 @@ Global
 		{0F03E6A8-2E41-426F-8402-E676A972DDDF} = {CFC86E59-1F61-4FFD-87FD-F5CDD1C8CE83}
 		{EFB75739-73B2-412B-81B0-9454A5AF46AE} = {CFC86E59-1F61-4FFD-87FD-F5CDD1C8CE83}
 		{753809F6-F5B1-4C68-9202-7E2A5E1B0959} = {CFC86E59-1F61-4FFD-87FD-F5CDD1C8CE83}
+		{342E1446-51B5-47E7-A5DD-B6ECBD5134B1} = {CFC86E59-1F61-4FFD-87FD-F5CDD1C8CE83}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BE970C17-E6A2-4FB9-8CF6-9BC80F2CAA4E}
