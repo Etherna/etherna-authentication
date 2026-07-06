@@ -13,5 +13,7 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 using System;
+using System.Runtime.CompilerServices;
 
 [assembly: CLSCompliant(false)]
+[assembly: InternalsVisibleTo("EthernaAuthentication.Native.UnitTest")]
