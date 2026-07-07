@@ -1,20 +1,21 @@
-﻿//   Copyright 2021-present Etherna Sagl
+// Copyright 2021-present Etherna SA
+// This file is part of EthernaAuthentication.
 //
-//   Licensed under the Apache License, Version 2.0 (the "License");
-//   you may not use this file except in compliance with the License.
-//   You may obtain a copy of the License at
+// EthernaAuthentication is free software: you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
 //
-//       http://www.apache.org/licenses/LICENSE-2.0
+// EthernaAuthentication is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
 //
-//   Unless required by applicable law or agreed to in writing, software
-//   distributed under the License is distributed on an "AS IS" BASIS,
-//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//   See the License for the specific language governing permissions and
-//   limitations under the License.
+// You should have received a copy of the GNU Lesser General Public License along with EthernaAuthentication.
+// If not, see <https://www.gnu.org/licenses/>.
 
+using Duende.AccessTokenManagement;
 using Duende.AccessTokenManagement.OpenIdConnect;
-using IdentityModel;
-using IdentityModel.Client;
+using Duende.IdentityModel;
+using Duende.IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Options;
 using System;
@@ -26,7 +27,7 @@ using System.Threading.Tasks;
 
 namespace Etherna.Authentication.Native.PasswordFlow
 {
-    public class EthernaApiKeySignInService : IEthernaSignInService
+    public sealed class EthernaApiKeySignInService : IEthernaApiKeySignInService
     {
         // Fields.
         private readonly IOpenIdConnectConfigurationService openIdConnectConfigurationService;
@@ -41,10 +42,8 @@ namespace Etherna.Authentication.Native.PasswordFlow
             IOptions<EthernaApiKeySignInServiceOptions> signInServiceOptions,
             IUserTokenStore userTokenStore)
         {
-            if (openIdConnectOptionsMonitor is null)
-                throw new ArgumentNullException(nameof(openIdConnectOptionsMonitor));
-            if (signInServiceOptions is null)
-                throw new ArgumentNullException(nameof(signInServiceOptions));
+            ArgumentNullException.ThrowIfNull(openIdConnectOptionsMonitor);
+            ArgumentNullException.ThrowIfNull(signInServiceOptions);
 
             this.openIdConnectConfigurationService = openIdConnectConfigurationService;
             openIdConnectOptions = openIdConnectOptionsMonitor.Get(
@@ -54,32 +53,31 @@ namespace Etherna.Authentication.Native.PasswordFlow
         }
 
         // Properties.
-        public ClaimsPrincipal? CurrentUser { get; private set; }
-        public bool IsAuthenticated => CurrentUser != null;
+        public string AuthenticationSchemeName => signInServiceOptions.AuthenticationSchemeName;
 
         // Methods.
-        public async Task SignInAsync()
+        public async Task<ClaimsPrincipal> SignInAsync(string apiKey)
         {
             // Check conditions.
-            if (string.IsNullOrWhiteSpace(signInServiceOptions.ApiKey))
+            if (string.IsNullOrWhiteSpace(apiKey))
                 throw new InvalidOperationException("Invalid empty api key");
 
             // Split api key.
-            var splitApiKey = signInServiceOptions.ApiKey.Split('.');
+            var splitApiKey = apiKey.Split('.');
             if (splitApiKey.Length != 2)
                 throw new InvalidOperationException("Invalid api key");
 
             // Get oidc config.
             var oidcConfig = await openIdConnectConfigurationService.GetOpenIdConnectConfigurationAsync(
-                signInServiceOptions.AuthenticationSchemeName).ConfigureAwait(false);
+                Scheme.Parse(signInServiceOptions.AuthenticationSchemeName)).ConfigureAwait(false);
 
             // Perform authentication request.
             using var client = new HttpClient();
             using var request = new PasswordTokenRequest
             {
-                Address = oidcConfig.TokenEndpoint,
+                Address = oidcConfig.TokenEndpoint.AbsoluteUri,
 
-                ClientId = oidcConfig.ClientId!,
+                ClientId = oidcConfig.ClientId,
                 Scope = string.Join(' ', openIdConnectOptions.Scope),
 
                 UserName = splitApiKey[0],
@@ -94,18 +92,20 @@ namespace Etherna.Authentication.Native.PasswordFlow
             var token = new JwtSecurityTokenHandler().ReadJwtToken(tokenResponse.AccessToken);
 
             // Store login result.
-            CurrentUser = Principal.Create(oidcConfig.Authority!, token.Claims.ToArray());
+            var currentUser = Principal.Create(oidcConfig.TokenEndpoint.Authority, token.Claims.ToArray());
             await userTokenStore.StoreTokenAsync(
-                CurrentUser,
+                currentUser,
                 new UserToken
                 {
-                    AccessToken = tokenResponse.AccessToken,
-                    AccessTokenType = tokenResponse.TokenType,
-                    Error = tokenResponse.Error,
+                    AccessToken = AccessToken.Parse(tokenResponse.AccessToken!),
+                    AccessTokenType = AccessTokenType.Parse(tokenResponse.TokenType!),
+                    ClientId = ClientId.Parse(oidcConfig.ClientId),
                     Expiration = DateTimeOffset.Now.AddSeconds(tokenResponse.ExpiresIn),
-                    RefreshToken = tokenResponse.RefreshToken,
-                    Scope = tokenResponse.Scope
+                    RefreshToken = RefreshToken.Parse(tokenResponse.RefreshToken!),
+                    Scope = Scope.Parse(tokenResponse.Scope!)
                 }).ConfigureAwait(false);
+
+            return currentUser;
         }
     }
 }

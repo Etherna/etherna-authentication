@@ -1,17 +1,18 @@
-﻿//   Copyright 2021-present Etherna Sagl
-//
-//   Licensed under the Apache License, Version 2.0 (the "License");
-//   you may not use this file except in compliance with the License.
-//   You may obtain a copy of the License at
-//
-//       http://www.apache.org/licenses/LICENSE-2.0
-//
-//   Unless required by applicable law or agreed to in writing, software
-//   distributed under the License is distributed on an "AS IS" BASIS,
-//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//   See the License for the specific language governing permissions and
-//   limitations under the License.
+﻿// Copyright 2021-present Etherna SA
+// This file is part of EthernaAuthentication.
+// 
+// EthernaAuthentication is free software: you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
+// 
+// EthernaAuthentication is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License along with EthernaAuthentication.
+// If not, see <https://www.gnu.org/licenses/>.
 
+using Duende.AccessTokenManagement;
 using Duende.AccessTokenManagement.OpenIdConnect;
 using System;
 using System.Collections.Generic;
@@ -20,23 +21,12 @@ using System.Threading.Tasks;
 
 namespace Etherna.Authentication.Native
 {
-    public class EthernaOpenIdConnectClient : EthernaOpenIdConnectClientBase
+    public class EthernaOpenIdConnectClient(
+        IDiscoveryDocumentService discoveryDocumentService,
+        IEthernaSignInService ethernaSignInService,
+        IUserTokenManager userTokenManagementService)
+        : EthernaOpenIdConnectClientBase(discoveryDocumentService)
     {
-        // Fields.
-        private readonly IEthernaSignInService ethernaSignInService;
-        private readonly IUserTokenManagementService userTokenManagementService;
-
-        // Constructor.
-        public EthernaOpenIdConnectClient(
-            IDiscoveryDocumentService discoveryDocumentService,
-            IEthernaSignInService ethernaSignInService,
-            IUserTokenManagementService userTokenManagementService)
-            : base(discoveryDocumentService)
-        {
-            this.ethernaSignInService = ethernaSignInService;
-            this.userTokenManagementService = userTokenManagementService;
-        }
-
         // Protected methods.
         protected override IEnumerable<Claim> GetCurrentUserClaims()
         {
@@ -51,14 +41,20 @@ namespace Etherna.Authentication.Native
             if (!ethernaSignInService.IsAuthenticated)
                 throw new InvalidOperationException("User is not authenticated");
 
-            var userToken = await userTokenManagementService.GetAccessTokenAsync(ethernaSignInService.CurrentUser!).ConfigureAwait(false);
-            if (userToken.IsError)
-                throw new InvalidOperationException($"Invalid token with error: {userToken.Error}");
+            //refresh must run on the scheme of the flow used to sign in: client ids differ between flows
+            var userToken = await userTokenManagementService.GetAccessTokenAsync(
+                ethernaSignInService.CurrentUser!,
+                new UserTokenRequestParameters
+                {
+                    ChallengeScheme = Scheme.Parse(ethernaSignInService.CurrentAuthenticationSchemeName!)
+                }).ConfigureAwait(false);
+            if (!userToken.Succeeded)
+                throw new InvalidOperationException($"Invalid token with error: {userToken.FailedResult.Error}");
 
-            if (string.IsNullOrWhiteSpace(userToken.AccessToken))
+            if (string.IsNullOrWhiteSpace(userToken.Token.AccessToken))
                 throw new InvalidOperationException("Invalid empty access token");
 
-            return userToken.AccessToken;
+            return userToken.Token.AccessToken;
         }
 
         protected override IEnumerable<Claim> TryGetCurrentUserClaims()
@@ -69,7 +65,7 @@ namespace Etherna.Authentication.Native
             }
             catch (InvalidOperationException)
             {
-                return Array.Empty<Claim>();
+                return [];
             }
         }
 

@@ -1,0 +1,65 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Native AOT compatibility probe for the EthernaAuthentication libraries.
+
+    Publishing this app with `dotnet publish -r <rid> -c Release` runs the ILC compiler, which
+    (unlike the Roslyn trim/AOT analyzers) does NOT skip [GeneratedCode] code. It therefore gives
+    a realistic, honest report of every trim/AOT warning across the libraries' surface.
+
+    All the libraries are added as TrimmerRootAssembly so ILC analyzes every operation
+    (not just what Main happens to reach). Dependencies (Duende, IdentityModel, ASP.NET Core) are
+    left to normal trimming, so only the code paths actually used are analyzed.
+
+    Any IL2026/IL3050/etc. warning fails the publish (warnings-as-errors).
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Etherna.Authentication.AotCompatibility</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <IsPublishable>true</IsPublishable>
+
+    <PublishAot>true</PublishAot>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <TrimmerSingleWarn>false</TrimmerSingleWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <MSBuildTreatWarningsAsErrors>true</MSBuildTreatWarningsAsErrors>
+
+    <!-- Warnings from the exempted assemblies below collapse into IL2104/IL3053: with
+         TrimmerSingleWarn=false no other assembly can produce these codes, so suppressing
+         them keeps the detailed warnings-as-errors gate intact everywhere else.
+         IL2026 escapes the per-assembly single-warn collapse in ILC, so it must be excluded
+         globally to exempt those same assemblies: the libraries' own code remains guarded
+         against IL2026 by the Roslyn trim analyzers (IsAotCompatible + warnings-as-errors). -->
+    <NoWarn>$(NoWarn);IL2104;IL3053;IL2026</NoWarn>
+  </PropertyGroup>
+
+  <!-- Third-party assemblies with known trim/AOT warnings that cannot be fixed from here.
+       Microsoft.Extensions.Caching.Hybrid: its default reflection-based JSON serializer factory
+       (registered unconditionally by AddHybridCache, required by Duende.AccessTokenManagement)
+       raises IL2026/IL3050/IL2070 even on the latest version; token types are cached through
+       Duende's own serializers at runtime, so the reflection fallback is never exercised. -->
+  <Target Name="ExemptKnownDirtyAssemblies" BeforeTargets="WriteIlcRspFileForCompilation;PrepareForILLink">
+    <ItemGroup>
+      <ManagedAssemblyToLink Condition="'%(Filename)' == 'Microsoft.Extensions.Caching.Hybrid'">
+        <TrimmerSingleWarn>true</TrimmerSingleWarn>
+      </ManagedAssemblyToLink>
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\EthernaAuthentication.AspNetCore\EthernaAuthentication.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\src\EthernaAuthentication.ClientCredentials\EthernaAuthentication.ClientCredentials.csproj" />
+    <ProjectReference Include="..\..\src\EthernaAuthentication.Native\EthernaAuthentication.Native.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <TrimmerRootAssembly Include="EthernaAuthentication" />
+    <TrimmerRootAssembly Include="EthernaAuthentication.AspNetCore" />
+    <TrimmerRootAssembly Include="EthernaAuthentication.ClientCredentials" />
+    <TrimmerRootAssembly Include="EthernaAuthentication.Native" />
+  </ItemGroup>
+
+</Project>

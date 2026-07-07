@@ -1,19 +1,20 @@
-﻿//   Copyright 2021-present Etherna Sagl
+// Copyright 2021-present Etherna SA
+// This file is part of EthernaAuthentication.
 //
-//   Licensed under the Apache License, Version 2.0 (the "License");
-//   you may not use this file except in compliance with the License.
-//   You may obtain a copy of the License at
+// EthernaAuthentication is free software: you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
 //
-//       http://www.apache.org/licenses/LICENSE-2.0
+// EthernaAuthentication is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
 //
-//   Unless required by applicable law or agreed to in writing, software
-//   distributed under the License is distributed on an "AS IS" BASIS,
-//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//   See the License for the specific language governing permissions and
-//   limitations under the License.
+// You should have received a copy of the GNU Lesser General Public License along with EthernaAuthentication.
+// If not, see <https://www.gnu.org/licenses/>.
 
+using Duende.AccessTokenManagement;
 using Duende.AccessTokenManagement.OpenIdConnect;
-using IdentityModel.OidcClient;
+using Duende.IdentityModel.OidcClient;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.Options;
 using System;
@@ -23,7 +24,7 @@ using System.Threading.Tasks;
 
 namespace Etherna.Authentication.Native.CodeFlow
 {
-    public class EthernaCodeSignInService : IEthernaSignInService
+    public sealed class EthernaCodeSignInService : IEthernaCodeSignInService
     {
         // Fields.
         private readonly OpenIdConnectOptions openIdConnectOptions;
@@ -36,10 +37,8 @@ namespace Etherna.Authentication.Native.CodeFlow
             IOptions<EthernaCodeSignInServiceOptions> signInServiceOptions,
             IUserTokenStore userTokenStore)
         {
-            if (openIdConnectOptionsMonitor is null)
-                throw new ArgumentNullException(nameof(openIdConnectOptionsMonitor));
-            if (signInServiceOptions is null)
-                throw new ArgumentNullException(nameof(signInServiceOptions));
+            ArgumentNullException.ThrowIfNull(openIdConnectOptionsMonitor);
+            ArgumentNullException.ThrowIfNull(signInServiceOptions);
 
             openIdConnectOptions = openIdConnectOptionsMonitor.Get(
                 signInServiceOptions.Value.AuthenticationSchemeName);
@@ -48,14 +47,13 @@ namespace Etherna.Authentication.Native.CodeFlow
         }
 
         // Properties.
-        public ClaimsPrincipal? CurrentUser { get; private set; }
-        public bool IsAuthenticated => CurrentUser != null;
+        public string AuthenticationSchemeName => signInServiceOptions.AuthenticationSchemeName;
 
         // Methods.
-        public async Task SignInAsync()
+        public async Task<ClaimsPrincipal> SignInAsync()
         {
-            // create a redirect URI using an available port on the loopback address.
-            // requires the OP to allow random ports on 127.0.0.1 - otherwise set a static port
+            // Create a redirect URI using an available port on the loopback address.
+            // Requires the OP to allow random ports on 127.0.0.1 - otherwise set a static port.
             var browser = new SystemBrowser(signInServiceOptions.ReturnUrlPort);
             var redirectUri = $"http://127.0.0.1:{browser.Port}";
 
@@ -72,22 +70,29 @@ namespace Etherna.Authentication.Native.CodeFlow
             };
 
             var oidcClient = new OidcClient(options);
+
+            // Mute environment warnings in console opening browser.
+            Environment.SetEnvironmentVariable("QT_LOGGING_RULES", "qt.qpa.*=false"); //QT warnings
+
+            // Open browser.
             var loginResult = await oidcClient.LoginAsync(new LoginRequest()).ConfigureAwait(false);
             if (loginResult.IsError)
                 throw new InvalidOperationException($"Error during authentication: {loginResult.Error}");
 
             // Store login result.
-            CurrentUser = loginResult.User;
             await userTokenStore.StoreTokenAsync(
                 loginResult.User,
                 new UserToken
                 {
-                    AccessToken = loginResult.AccessToken,
-                    Error = loginResult.Error,
+                    ClientId = ClientId.Parse(openIdConnectOptions.ClientId!),
+                    AccessTokenType = AccessTokenType.Parse("Bearer"),
+                    AccessToken = AccessToken.Parse(loginResult.AccessToken),
                     Expiration = loginResult.AccessTokenExpiration,
-                    RefreshToken = loginResult.RefreshToken,
-                    Scope = options.Scope
+                    RefreshToken = RefreshToken.Parse(loginResult.RefreshToken),
+                    Scope = Scope.Parse(options.Scope)
                 }).ConfigureAwait(false);
+
+            return loginResult.User;
         }
     }
 }

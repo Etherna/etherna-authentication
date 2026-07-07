@@ -1,29 +1,55 @@
-﻿//   Copyright 2021-present Etherna Sagl
+// Copyright 2021-present Etherna SA
+// This file is part of EthernaAuthentication.
 //
-//   Licensed under the Apache License, Version 2.0 (the "License");
-//   you may not use this file except in compliance with the License.
-//   You may obtain a copy of the License at
+// EthernaAuthentication is free software: you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
 //
-//       http://www.apache.org/licenses/LICENSE-2.0
+// EthernaAuthentication is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
 //
-//   Unless required by applicable law or agreed to in writing, software
-//   distributed under the License is distributed on an "AS IS" BASIS,
-//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//   See the License for the specific language governing permissions and
-//   limitations under the License.
+// You should have received a copy of the GNU Lesser General Public License along with EthernaAuthentication.
+// If not, see <https://www.gnu.org/licenses/>.
 
 using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Etherna.Authentication.Native
 {
+    /// <summary>
+    /// Sign in a user with any of the registered native authentication flows.
+    /// The flow is selected at sign-in time, choosing the <c>SignInAsync</c> overload.
+    /// </summary>
     public interface IEthernaSignInService
     {
         // Properties.
+        /// <summary>
+        /// The authentication scheme name of the flow used by the current sign-in,
+        /// or <c>null</c> if no user is signed in.
+        /// </summary>
+        string? CurrentAuthenticationSchemeName { get; }
+
+        /// <summary>
+        /// The currently signed-in user, or <c>null</c> if no user is signed in.
+        /// </summary>
         ClaimsPrincipal? CurrentUser { get; }
+
+        /// <summary>
+        /// Whether a user is currently signed in.
+        /// </summary>
         bool IsAuthenticated { get; }
 
         // Methods.
+        /// <summary>
+        /// Sign in interactively with the code flow, opening the system browser.
+        /// </summary>
         Task SignInAsync();
+
+        /// <summary>
+        /// Sign in with an Etherna api key (password flow), without user interaction.
+        /// </summary>
+        /// <param name="apiKey">The Etherna api key</param>
+        Task SignInAsync(string apiKey);
     }
 }

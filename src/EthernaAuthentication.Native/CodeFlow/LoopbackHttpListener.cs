@@ -1,20 +1,21 @@
-﻿//   Copyright 2021-present Etherna Sagl
-//
-//   Licensed under the Apache License, Version 2.0 (the "License");
-//   you may not use this file except in compliance with the License.
-//   You may obtain a copy of the License at
-//
-//       http://www.apache.org/licenses/LICENSE-2.0
-//
-//   Unless required by applicable law or agreed to in writing, software
-//   distributed under the License is distributed on an "AS IS" BASIS,
-//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//   See the License for the specific language governing permissions and
-//   limitations under the License.
+﻿// Copyright 2021-present Etherna SA
+// This file is part of EthernaAuthentication.
+// 
+// EthernaAuthentication is free software: you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
+// 
+// EthernaAuthentication is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License along with EthernaAuthentication.
+// If not, see <https://www.gnu.org/licenses/>.
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading.Tasks;
 
@@ -23,16 +24,16 @@ namespace Etherna.Authentication.Native.CodeFlow
     internal sealed class LoopbackHttpListener : IDisposable
     {
         // Consts.
-        private const string DefaultFailureContentType = "text/html";
-        private const string DefaultFailureResponse = "<h1>Invalid request.</h1>";
-        private const string DefaultSuccessContentType = "text/html";
-        private const string DefaultSuccessResponse = "<h1>You can now return to the application.</h1>";
+        private const string DefaultFailureContentType = "text/html; charset=utf-8";
+        private const string DefaultFailureResponse = DefaultReturnPages.Failure;
+        private const string DefaultSuccessContentType = "text/html; charset=utf-8";
+        private const string DefaultSuccessResponse = DefaultReturnPages.Success;
         private const int DefaultTimeout = 60 * 5; // 5 mins (in seconds)
 
         // Fields.
         private bool isDisposed;
 
-        private readonly IWebHost host;
+        private readonly IHost host;
         private readonly TaskCompletionSource<string> _source = new();
         private readonly string _url;
         private readonly string failureContentType;
@@ -55,15 +56,19 @@ namespace Etherna.Authentication.Native.CodeFlow
             this.successResponse = successResponse ?? DefaultSuccessResponse;
 
             path ??= string.Empty;
-            if (path.StartsWith("/", StringComparison.InvariantCultureIgnoreCase))
+            if (path.StartsWith('/'))
                 path = path[1..];
 
             _url = $"http://127.0.0.1:{port}/{path}";
 
-            host = new WebHostBuilder()
-                .UseKestrel()
-                .UseUrls(_url)
-                .Configure(Configure)
+            host = new HostBuilder()
+                .ConfigureWebHost(webHostBuilder =>
+                {
+                    webHostBuilder
+                        .UseKestrel()
+                        .UseUrls(_url)
+                        .Configure(Configure);
+                })
                 .Build();
             host.Start();
         }

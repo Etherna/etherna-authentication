@@ -1,21 +1,24 @@
-//   Copyright 2021-present Etherna Sagl
-//
-//   Licensed under the Apache License, Version 2.0 (the "License");
-//   you may not use this file except in compliance with the License.
-//   You may obtain a copy of the License at
-//
-//       http://www.apache.org/licenses/LICENSE-2.0
-//
-//   Unless required by applicable law or agreed to in writing, software
-//   distributed under the License is distributed on an "AS IS" BASIS,
-//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//   See the License for the specific language governing permissions and
-//   limitations under the License.
+// Copyright 2021-present Etherna SA
+// This file is part of EthernaAuthentication.
+// 
+// EthernaAuthentication is free software: you can redistribute it and/or modify it under the terms of the
+// GNU Lesser General Public License as published by the Free Software Foundation,
+// either version 3 of the License, or (at your option) any later version.
+// 
+// EthernaAuthentication is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// See the GNU Lesser General Public License for more details.
+// 
+// You should have received a copy of the GNU Lesser General Public License along with EthernaAuthentication.
+// If not, see <https://www.gnu.org/licenses/>.
 
+using Duende.AccessTokenManagement;
+using Duende.AccessTokenManagement.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Linq;
 
 namespace Etherna.Authentication.AspNetCore
 {
@@ -30,6 +33,12 @@ namespace Etherna.Authentication.AspNetCore
         /// <para>
         /// Etherna authentication allows application users to sign in with their Etherna account.
         /// </para>
+        /// <para>
+        /// User access token management is registered automatically, bound to the registered scheme,
+        /// unless the application has already registered its own. Set <see cref="OpenIdConnectOptions.SaveTokens"/>
+        /// to <c>true</c> to consume managed user tokens, and request the <c>offline_access</c> scope
+        /// to permit token refresh.
+        /// </para>
         /// </summary>
         /// <param name="builder">The <see cref="AuthenticationBuilder"/>.</param>
         /// <param name="configureOptions">A delegate to configure <see cref="OpenIdConnectOptions"/>.</param>
@@ -42,6 +51,12 @@ namespace Etherna.Authentication.AspNetCore
         /// The default scheme is specified by <see cref="EthernaDefaults.AuthenticationScheme"/>.
         /// <para>
         /// Etherna authentication allows application users to sign in with their Etherna account.
+        /// </para>
+        /// <para>
+        /// User access token management is registered automatically, bound to the registered scheme,
+        /// unless the application has already registered its own. Set <see cref="OpenIdConnectOptions.SaveTokens"/>
+        /// to <c>true</c> to consume managed user tokens, and request the <c>offline_access</c> scope
+        /// to permit token refresh.
         /// </para>
         /// </summary>
         /// <param name="builder">The <see cref="AuthenticationBuilder"/>.</param>
@@ -57,6 +72,12 @@ namespace Etherna.Authentication.AspNetCore
         /// <para>
         /// Etherna authentication allows application users to sign in with their Etherna account.
         /// </para>
+        /// <para>
+        /// User access token management is registered automatically, bound to the registered scheme,
+        /// unless the application has already registered its own. Set <see cref="OpenIdConnectOptions.SaveTokens"/>
+        /// to <c>true</c> to consume managed user tokens, and request the <c>offline_access</c> scope
+        /// to permit token refresh.
+        /// </para>
         /// </summary>
         /// <param name="builder">The <see cref="AuthenticationBuilder"/>.</param>
         /// <param name="authenticationScheme">The authentication scheme.</param>
@@ -65,10 +86,8 @@ namespace Etherna.Authentication.AspNetCore
         public static AuthenticationBuilder AddEthernaOpenIdConnect(this AuthenticationBuilder builder, string authenticationScheme, string displayName, Action<OpenIdConnectOptions> configureOptions)
         {
             // Check conditions.
-            if (builder is null)
-                throw new ArgumentNullException(nameof(builder));
-            if (configureOptions is null)
-                throw new ArgumentNullException(nameof(configureOptions));
+            ArgumentNullException.ThrowIfNull(builder);
+            ArgumentNullException.ThrowIfNull(configureOptions);
 
             var options = new OpenIdConnectOptions();
             configureOptions(options);
@@ -79,9 +98,14 @@ namespace Etherna.Authentication.AspNetCore
             // Add Etherna oidc client.
             builder.Services.AddSingleton<IDiscoveryDocumentService>(
                 new DiscoveryDocumentService(options.Authority, options.RequireHttpsMetadata));
-            builder.Services.AddScoped<IEthernaOpenIdConnectClient, EthernaOpenIdConnectClient>();
+            builder.Services.AddScoped<IEthernaOpenIdConnectClient, EthernaOpenIdConnectClient>(); //scoped because of user claims cache
 
             builder.AddOpenIdConnect(authenticationScheme, displayName, configureOptions);
+
+            // Add automatic user access token management, unless the application already registered it.
+            if (builder.Services.All(s => s.ServiceType != typeof(IUserTokenManager)))
+                builder.Services.AddOpenIdConnectAccessTokenManagement(tokenManagementOptions =>
+                    tokenManagementOptions.ChallengeScheme = Scheme.Parse(authenticationScheme));
 
             return builder;
         }
