@@ -57,7 +57,8 @@ namespace Etherna.Authentication.AotCompatibility
             {
                 var client = new CannedClaimsClient(
                     new Claim(EthernaClaimTypes.EtherPreviousAddresses, """["0x0000000000000000000000000000000000000001","0x0000000000000000000000000000000000000002"]"""),
-                    new Claim(EthernaClaimTypes.Role_Dotnet, "probeRole"),
+                    new Claim(EthernaClaimTypes.Role_Dotnet, "probeRole0"),
+                    new Claim(EthernaClaimTypes.Role_Dotnet, "probeRole1"),
                     new Claim(EthernaClaimTypes.Username, "probeUser"));
 
                 var prevAddresses = await client.GetEtherPrevAddressesAsync().ConfigureAwait(false);
@@ -65,7 +66,7 @@ namespace Etherna.Authentication.AotCompatibility
                     throw new InvalidOperationException($"Unexpected previous addresses count {prevAddresses.Length}.");
 
                 var roles = await client.GetRolesAsync().ConfigureAwait(false);
-                if (roles.Length != 1 || roles[0] != "probeRole")
+                if (roles.Length != 2 || roles[0] != "probeRole0" || roles[1] != "probeRole1")
                     throw new InvalidOperationException("Unexpected roles.");
 
                 Console.WriteLine($"[ok] json: deserialized {prevAddresses.Length} previous addresses via source-generated context");
