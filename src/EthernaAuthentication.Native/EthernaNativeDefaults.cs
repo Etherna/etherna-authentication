@@ -12,44 +12,37 @@
 // You should have received a copy of the GNU Lesser General Public License along with EthernaAuthentication.
 // If not, see <https://www.gnu.org/licenses/>.
 
-using System.Security.Claims;
-using System.Threading.Tasks;
-
 namespace Etherna.Authentication.Native
 {
     /// <summary>
-    /// Sign in a user with any of the registered native authentication flows.
-    /// The flow is selected at sign-in time, choosing the <c>SignInAsync</c> overload.
+    /// Default values for the Etherna native authentication flows.
     /// </summary>
-    public interface IEthernaSignInService
+    public static class EthernaNativeDefaults
     {
-        // Properties.
         /// <summary>
-        /// The authentication scheme name of the flow used by the current sign-in,
-        /// or <c>null</c> if no user is signed in.
+        /// The authentication scheme for the api key (password) flow. The value is <c>EthernaApiKey</c>.
         /// </summary>
-        string? CurrentAuthenticationSchemeName { get; }
+        public const string ApiKeyAuthenticationScheme = "EthernaApiKey";
 
         /// <summary>
-        /// The currently signed-in user, or <c>null</c> if no user is signed in.
+        /// The OpenID Connect client id dedicated to api key sign-in, registered on the Etherna SSO server.
         /// </summary>
-        ClaimsPrincipal? CurrentUser { get; }
+        public const string ApiKeyClientId = "apiKeyClientId";
 
         /// <summary>
-        /// Whether a user is currently signed in.
+        /// The display name for the api key authentication scheme.
         /// </summary>
-        bool IsAuthenticated { get; }
-
-        // Methods.
-        /// <summary>
-        /// Sign in interactively with the code flow, opening the system browser.
-        /// </summary>
-        Task SignInAsync();
+        public const string ApiKeyDisplayName = "Etherna api key";
 
         /// <summary>
-        /// Sign in with an Etherna api key (password flow), without user interaction.
+        /// The authentication scheme for the interactive code flow.
+        /// Same value as <see cref="EthernaDefaults.AuthenticationScheme"/>.
         /// </summary>
-        /// <param name="apiKey">The Etherna api key</param>
-        Task SignInAsync(string apiKey);
+        public const string CodeAuthenticationScheme = EthernaDefaults.AuthenticationScheme;
+
+        /// <summary>
+        /// The display name for the code flow authentication scheme.
+        /// </summary>
+        public const string CodeDisplayName = EthernaDefaults.DisplayName;
     }
 }

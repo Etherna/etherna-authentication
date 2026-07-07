@@ -1,14 +1,14 @@
-﻿// Copyright 2021-present Etherna SA
+// Copyright 2021-present Etherna SA
 // This file is part of EthernaAuthentication.
-// 
+//
 // EthernaAuthentication is free software: you can redistribute it and/or modify it under the terms of the
 // GNU Lesser General Public License as published by the Free Software Foundation,
 // either version 3 of the License, or (at your option) any later version.
-// 
+//
 // EthernaAuthentication is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 // without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // See the GNU Lesser General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU Lesser General Public License along with EthernaAuthentication.
 // If not, see <https://www.gnu.org/licenses/>.
 
@@ -20,12 +20,11 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Net.Http;
 using System.Security.Claims;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Etherna.Authentication.Native.CodeFlow
 {
-    public class EthernaCodeSignInService : IEthernaSignInService, IUserAccessor
+    public sealed class EthernaCodeSignInService : IEthernaCodeSignInService
     {
         // Fields.
         private readonly OpenIdConnectOptions openIdConnectOptions;
@@ -48,14 +47,10 @@ namespace Etherna.Authentication.Native.CodeFlow
         }
 
         // Properties.
-        public ClaimsPrincipal? CurrentUser { get; private set; }
-        public bool IsAuthenticated => CurrentUser != null;
+        public string AuthenticationSchemeName => signInServiceOptions.AuthenticationSchemeName;
 
         // Methods.
-        public Task<ClaimsPrincipal> GetCurrentUserAsync(CancellationToken ct = new()) =>
-            Task.FromResult(CurrentUser ?? new ClaimsPrincipal());
-        
-        public async Task SignInAsync()
+        public async Task<ClaimsPrincipal> SignInAsync()
         {
             // Create a redirect URI using an available port on the loopback address.
             // Requires the OP to allow random ports on 127.0.0.1 - otherwise set a static port.
@@ -75,17 +70,16 @@ namespace Etherna.Authentication.Native.CodeFlow
             };
 
             var oidcClient = new OidcClient(options);
-            
+
             // Mute environment warnings in console opening browser.
             Environment.SetEnvironmentVariable("QT_LOGGING_RULES", "qt.qpa.*=false"); //QT warnings
-            
+
             // Open browser.
             var loginResult = await oidcClient.LoginAsync(new LoginRequest()).ConfigureAwait(false);
             if (loginResult.IsError)
                 throw new InvalidOperationException($"Error during authentication: {loginResult.Error}");
 
             // Store login result.
-            CurrentUser = loginResult.User;
             await userTokenStore.StoreTokenAsync(
                 loginResult.User,
                 new UserToken
@@ -97,6 +91,8 @@ namespace Etherna.Authentication.Native.CodeFlow
                     RefreshToken = RefreshToken.Parse(loginResult.RefreshToken),
                     Scope = Scope.Parse(options.Scope)
                 }).ConfigureAwait(false);
+
+            return loginResult.User;
         }
     }
 }

@@ -142,16 +142,18 @@ namespace Etherna.Authentication.AotCompatibility
             try
             {
                 var services = new ServiceCollection();
-                services.AddEthernaApiKeyOidcClient(
+                services.AddEthernaOidcClient(
                     Authority,
-                    "probeUser.probeKey",
+                    "probeClientId",
+                    null,
+                    11420,
                     [EthernaScopes.UserApiCredit],
                     "probeHttpClient");
 
                 await using var provider = services.BuildServiceProvider();
 
-                // Resolving the client builds the sign in service, which pulls the OpenId Connect
-                // options pipeline (post-configuration, data protection, configuration manager).
+                // Resolving the client builds the sign in services of both flows, which pull the OpenId
+                // Connect options pipeline (post-configuration, data protection, configuration manager).
                 var client = provider.GetRequiredService<IEthernaOpenIdConnectClient>();
 
                 // Unauthenticated user: must return null without touching the network.
