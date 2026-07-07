@@ -32,6 +32,27 @@ namespace Etherna.Authentication.Native.CodeFlow
 
         // Tests.
         [Fact]
+        public async Task InvokeAsyncReturnsBrandedDefaultSuccessPageToBrowser()
+        {
+            var browser = new SystemBrowser(openBrowser: _ => { });
+
+            var invokeTask = browser.InvokeAsync(
+                new BrowserOptions(StartUrl, $"http://127.0.0.1:{browser.Port}"),
+                CancellationToken.None);
+
+            using var httpClient = new HttpClient();
+            var callbackResponse = await httpClient.GetAsync(new Uri($"http://127.0.0.1:{browser.Port}/?code=xyz"));
+            await invokeTask;
+
+            var content = await callbackResponse.Content.ReadAsStringAsync();
+            Assert.Equal("text/html", callbackResponse.Content.Headers.ContentType?.MediaType);
+            Assert.Equal("utf-8", callbackResponse.Content.Headers.ContentType?.CharSet);
+            Assert.StartsWith("<!DOCTYPE html>", content, StringComparison.Ordinal);
+            Assert.Contains("aria-label=\"etherna\"", content, StringComparison.Ordinal);
+            Assert.Contains("You are signed in", content, StringComparison.Ordinal);
+        }
+
+        [Fact]
         public async Task InvokeAsyncReturnsCustomSuccessResponseToBrowser()
         {
             var browser = new SystemBrowser(

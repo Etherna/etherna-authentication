@@ -24,10 +24,10 @@ namespace Etherna.Authentication.Native.CodeFlow
     internal sealed class LoopbackHttpListener : IDisposable
     {
         // Consts.
-        private const string DefaultFailureContentType = "text/html";
-        private const string DefaultFailureResponse = "<h1>Invalid request.</h1>";
-        private const string DefaultSuccessContentType = "text/html";
-        private const string DefaultSuccessResponse = "<h1>You can now return to the application.</h1>";
+        private const string DefaultFailureContentType = "text/html; charset=utf-8";
+        private const string DefaultFailureResponse = DefaultReturnPages.Failure;
+        private const string DefaultSuccessContentType = "text/html; charset=utf-8";
+        private const string DefaultSuccessResponse = DefaultReturnPages.Success;
         private const int DefaultTimeout = 60 * 5; // 5 mins (in seconds)
 
         // Fields.
