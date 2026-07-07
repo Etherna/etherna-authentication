@@ -138,5 +138,71 @@ namespace Etherna.Authentication
             Assert.False(await client.HasScopesAsync("userApi.credit"));
             Assert.False(discoveryService.UserinfoFallbackEntered);
         }
+
+        [Fact]
+        public async Task GetRolesWithMultipleDotnetRoleClaimsReturnsAllRoles()
+        {
+            var discoveryService = new RecordingDiscoveryDocumentService();
+            var client = new TestOidcClient(discoveryService,
+            [
+                new Claim(EthernaClaimTypes.UserId, "testUserId"),
+                new Claim(EthernaClaimTypes.Role_Dotnet, "testRole0"),
+                new Claim(EthernaClaimTypes.Role_Dotnet, "testRole1")
+            ]);
+
+            var roles = await client.GetRolesAsync();
+
+            Assert.Equal(["testRole0", "testRole1"], roles);
+            Assert.False(discoveryService.UserinfoFallbackEntered);
+        }
+
+        [Fact]
+        public async Task GetRolesWithMultipleIdentityModelRoleClaimsReturnsAllRoles()
+        {
+            var discoveryService = new RecordingDiscoveryDocumentService();
+            var client = new TestOidcClient(discoveryService,
+            [
+                new Claim(EthernaClaimTypes.ClientId, "testClientId"),
+                new Claim(EthernaClaimTypes.Role_IdentityModel, "testRole0"),
+                new Claim(EthernaClaimTypes.Role_IdentityModel, "testRole1")
+            ]);
+
+            var roles = await client.GetRolesAsync();
+
+            Assert.Equal(["testRole0", "testRole1"], roles);
+            Assert.False(discoveryService.UserinfoFallbackEntered);
+        }
+
+        [Fact]
+        public async Task GetRolesWithBothRoleClaimTypesPrefersDotnetClaims()
+        {
+            var discoveryService = new RecordingDiscoveryDocumentService();
+            var client = new TestOidcClient(discoveryService,
+            [
+                new Claim(EthernaClaimTypes.UserId, "testUserId"),
+                new Claim(EthernaClaimTypes.Role_Dotnet, "dotnetRole"),
+                new Claim(EthernaClaimTypes.Role_IdentityModel, "identityModelRole")
+            ]);
+
+            var roles = await client.GetRolesAsync();
+
+            Assert.Equal(["dotnetRole"], roles);
+            Assert.False(discoveryService.UserinfoFallbackEntered);
+        }
+
+        [Fact]
+        public async Task TryGetRolesWithMachinePrincipalWithoutRolesReturnsNullWithoutUserinfoFallback()
+        {
+            var discoveryService = new RecordingDiscoveryDocumentService();
+            var client = new TestOidcClient(discoveryService,
+            [
+                new Claim(EthernaClaimTypes.ClientId, "testClientId")
+            ]);
+
+            var roles = await client.TryGetRolesAsync();
+
+            Assert.Null(roles);
+            Assert.False(discoveryService.UserinfoFallbackEntered);
+        }
     }
 }
