@@ -25,8 +25,7 @@ application type to sign in with an Etherna account and call the Etherna APIs wi
   - [ASP.NET Core web app — sign in users with Etherna](#aspnet-core-web-app--sign-in-users-with-etherna)
   - [Read the authenticated user's identity](#read-the-authenticated-users-identity)
   - [Service-to-service — client credentials](#service-to-service--client-credentials)
-  - [Native app — interactive sign-in with the system browser](#native-app--interactive-sign-in-with-the-system-browser)
-  - [Native app — scripted sign-in with an api key](#native-app--scripted-sign-in-with-an-api-key)
+  - [Native app — sign in choosing the flow at runtime](#native-app--sign-in-choosing-the-flow-at-runtime)
   - [Etherna constants — schemes, scopes and claims](#etherna-constants--schemes-scopes-and-claims)
 - [Supported frameworks](#supported-frameworks)
 - [Building and testing](#building-and-testing)
@@ -45,6 +44,9 @@ application type to sign in with an Etherna account and call the Etherna APIs wi
   and receive the result on a local loopback listener. The recommended flow for desktop and console apps.
 - **Api-key sign-in for automation** — authenticate a user without interaction (password flow), for
   scripted scenarios where opening a browser is not an option.
+- **Sign-in flow chosen at runtime** — a single registration wires both native flows: pick interactive or
+  api-key sign-in only when signing in, e.g. after parsing the user's input, without any registration-time
+  commitment.
 - **Client credentials for services** — authenticate an application with its own identity, without any
   user. No ASP.NET dependency, usable by any kind of .NET application or service.
 - **Automatic token management** — access tokens are acquired, cached and refreshed transparently,
@@ -187,10 +189,18 @@ var response = await httpClient.GetAsync(new Uri("api/v0.3/...", UriKind.Relativ
 
 `AddClient` can be chained to register several clients, each with its own scopes and managed `HttpClient`.
 
-### Native app — interactive sign-in with the system browser
+### Native app — sign in choosing the flow at runtime
 
-The recommended flow for desktop and console apps. `SignInAsync` opens the system browser on the Etherna
-SSO login page and receives the authentication result on a local loopback listener, on the given port.
+`AddEthernaOidcClient` registers both native sign-in flows together:
+
+- the **interactive code flow** — the recommended one for desktop and console apps: `SignInAsync()` opens
+  the system browser on the Etherna SSO login page and receives the authentication result on a local
+  loopback listener, on the given port;
+- the **api key flow** — for automation scenarios where no user can interact with a browser:
+  `SignInAsync(apiKey)` signs in with an Etherna api key (password flow), without any interaction.
+
+No flow is chosen at registration time: after the service provider is built, pick the `SignInAsync`
+overload — passing the api key, if there is one — e.g. based on the parsed command line input.
 The `offline_access` and `ether_accounts` scopes are always requested; pass any additional scope you need.
 
 ```csharp
@@ -200,9 +210,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 var services = new ServiceCollection();
 
-services.AddEthernaCodeOidcClient(
+services.AddEthernaOidcClient(
     authority: "https://sso.etherna.io/",
-    clientId: "yourClientId",
+    clientId: "yourClientId",                 // used by the code flow
     clientSecret: null,                       // public native clients have no secret
     returnUrlPort: 11420,                     // must match the client's redirect url on the SSO server
     scopes: [EthernaScopes.UserApiGateway],
@@ -210,9 +220,12 @@ services.AddEthernaCodeOidcClient(
 
 await using var serviceProvider = services.BuildServiceProvider();
 
-// Open the system browser and wait for the user to complete the sign-in.
+// Choose the sign-in flow at runtime, e.g. from the user's input.
 var signInService = serviceProvider.GetRequiredService<IEthernaSignInService>();
-await signInService.SignInAsync();
+if (apiKey is null)
+    await signInService.SignInAsync();        // opens the system browser and waits for the sign-in
+else
+    await signInService.SignInAsync(apiKey);  // signs in with the api key, without interaction
 
 // Read the signed-in user's identity.
 var oidcClient = serviceProvider.GetRequiredService<IEthernaOpenIdConnectClient>();
@@ -222,34 +235,9 @@ Console.WriteLine($"Signed in as {await oidcClient.GetUsernameAsync()}");
 var httpClient = serviceProvider.GetRequiredService<IHttpClientFactory>().CreateClient("ethernaApi");
 ```
 
-### Native app — scripted sign-in with an api key
-
-For automation scenarios where no user can interact with a browser, sign in with an Etherna api key
-(password flow). The registration mirrors the code flow one; only the sign-in step changes, requiring no
-interaction. Prefer the interactive code flow whenever scripting is not a requirement — the password flow
-is generally considered less secure.
-
-```csharp
-using Etherna.Authentication;
-using Etherna.Authentication.Native;
-using Microsoft.Extensions.DependencyInjection;
-
-var services = new ServiceCollection();
-
-services.AddEthernaApiKeyOidcClient(
-    authority: "https://sso.etherna.io/",
-    apiKey: Environment.GetEnvironmentVariable("ETHERNA_API_KEY")!,
-    scopes: [EthernaScopes.UserApiGateway],
-    managedHttpClientName: "ethernaApi");
-
-await using var serviceProvider = services.BuildServiceProvider();
-
-// Signs in with the api key, without opening any browser.
-var signInService = serviceProvider.GetRequiredService<IEthernaSignInService>();
-await signInService.SignInAsync();
-
-var httpClient = serviceProvider.GetRequiredService<IHttpClientFactory>().CreateClient("ethernaApi");
-```
+The api key flow authenticates on a client dedicated to api keys on the SSO server, so `clientId` and
+`returnUrlPort` only affect code flow sign-ins. Prefer the interactive code flow whenever scripting is
+not a requirement — the password flow is generally considered less secure.
 
 ### Etherna constants — schemes, scopes and claims
 

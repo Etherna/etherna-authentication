@@ -12,6 +12,7 @@
 // You should have received a copy of the GNU Lesser General Public License along with EthernaAuthentication.
 // If not, see <https://www.gnu.org/licenses/>.
 
+using Duende.AccessTokenManagement;
 using Duende.AccessTokenManagement.OpenIdConnect;
 using System;
 using System.Collections.Generic;
@@ -40,7 +41,13 @@ namespace Etherna.Authentication.Native
             if (!ethernaSignInService.IsAuthenticated)
                 throw new InvalidOperationException("User is not authenticated");
 
-            var userToken = await userTokenManagementService.GetAccessTokenAsync(ethernaSignInService.CurrentUser!).ConfigureAwait(false);
+            //refresh must run on the scheme of the flow used to sign in: client ids differ between flows
+            var userToken = await userTokenManagementService.GetAccessTokenAsync(
+                ethernaSignInService.CurrentUser!,
+                new UserTokenRequestParameters
+                {
+                    ChallengeScheme = Scheme.Parse(ethernaSignInService.CurrentAuthenticationSchemeName!)
+                }).ConfigureAwait(false);
             if (!userToken.Succeeded)
                 throw new InvalidOperationException($"Invalid token with error: {userToken.FailedResult.Error}");
 
