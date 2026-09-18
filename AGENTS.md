@@ -137,7 +137,7 @@ Use principal-style section comments to delimit groups (singular `// Constructor
 - Nullable reference types enabled (`<Nullable>enable</Nullable>`)
 - `ArgumentNullException.ThrowIfNull(param)` for parameter validation
 - `is null` / `is not null` (not `== null`)
-- Prefer `null` over `default` as default value for optional parameters
+- Prefer `null` over `default` wherever the type admits it: optional parameter defaults, late-init member initializers (`= null!`, not `= default!`), returns and assignments. Keep `default` only where `null` can't apply: non-nullable value types (e.g. `CancellationToken cancellationToken = default`) and unconstrained generic type parameters.
 - `??` and `??=` operators; `??` with throw: `httpContext ?? throw new InvalidOperationException()`
 - `ClaimsPrincipal?` for potentially unauthenticated contexts
 
@@ -152,12 +152,13 @@ Use principal-style section comments to delimit groups (singular `// Constructor
 ## C# Language Features
 
 - Pattern matching: `is`, `is not`, type patterns, property patterns
-- Prefer a property pattern over a chain of `&&` that combines a type/null check with member accesses: it expresses the condition as a single declarative "shape" the value must match
+- Prefer a property pattern over a chain of `&&` that combines a type/null check with member accesses: it expresses the condition as a single declarative "shape" the value must match. This applies also to pure boolean member chains on the same value, with no type/null check involved: `field is { IsInitOnly: false, IsLiteral: false }`, not `!field.IsInitOnly && !field.IsLiteral`
 - Switch expressions for multi-branch returns
 - Primary constructors everywhere applicable
 - Collection expressions: `[]`, `[..spread]`
 - Prefer collection expressions over constructors to initialize any collection: `[]` not `new()`, `["a", "b"]` not `new List<string> { "a", "b" }`. Use a constructor only when a collection expression can't express the intent (e.g. presizing capacity with `new List<T>(capacity)`).
 - Target-typed `new()` when type is clear from context (for non-collection types)
+- Lock fields: prefer the dedicated `System.Threading.Lock` type (.NET 9+) over a plain `object` — more expressive, and the compiler enforces correct `lock` usage on it.
 
 ## LINQ
 
