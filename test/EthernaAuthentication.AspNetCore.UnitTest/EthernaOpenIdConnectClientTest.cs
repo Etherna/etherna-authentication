@@ -18,6 +18,7 @@ using Duende.IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -114,7 +115,8 @@ namespace Etherna.Authentication.AspNetCore
 
             return new EthernaOpenIdConnectClient(
                 discoveryService,
-                new HttpContextAccessor { HttpContext = httpContext });
+                new HttpContextAccessor { HttpContext = httpContext },
+                NullLogger<EthernaOpenIdConnectClient>.Instance);
         }
 
         // Tests.

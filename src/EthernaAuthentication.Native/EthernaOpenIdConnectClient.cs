@@ -14,6 +14,7 @@
 
 using Duende.AccessTokenManagement;
 using Duende.AccessTokenManagement.OpenIdConnect;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -24,8 +25,9 @@ namespace Etherna.Authentication.Native
     public class EthernaOpenIdConnectClient(
         IDiscoveryDocumentService discoveryDocumentService,
         IEthernaSignInService ethernaSignInService,
+        ILogger<EthernaOpenIdConnectClient> logger,
         IUserTokenManager userTokenManagementService)
-        : EthernaOpenIdConnectClientBase(discoveryDocumentService)
+        : EthernaOpenIdConnectClientBase(discoveryDocumentService, logger)
     {
         // Protected methods.
         protected override IEnumerable<Claim> GetCurrentUserClaims()

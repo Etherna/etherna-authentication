@@ -13,33 +13,43 @@
 // If not, see <https://www.gnu.org/licenses/>.
 
 using Duende.IdentityModel.Client;
+using Etherna.Authentication.Extensions;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Etherna.Authentication
 {
     public abstract class EthernaOpenIdConnectClientBase(
-        IDiscoveryDocumentService discoveryDocumentService)
+        IDiscoveryDocumentService discoveryDocumentService,
+        ILogger logger)
         : IEthernaOpenIdConnectClient
     {
         // Fields.
-        //shared client: avoids per-call socket allocation, and bounds userinfo round-trips
-        //well below the 100s HttpClient default timeout. Recycling pooled connections keeps
-        //DNS changes visible despite the client living for the whole process.
+        //shared client: avoids per-call socket allocation. Recycling pooled connections keeps
+        //DNS changes visible despite the client living for the whole process. Round-trips
+        //are bounded per request by UserInfoTimeout, instead of the client own timeout.
         private static readonly HttpClient userInfoHttpClient = new(
             new SocketsHttpHandler { PooledConnectionLifetime = TimeSpan.FromMinutes(5) })
         {
-            Timeout = TimeSpan.FromSeconds(15)
+            Timeout = Timeout.InfiniteTimeSpan
         };
+        private bool isUserTokenRejected;
         private IEnumerable<Claim>? userInfo;
 
         // Properties.
         public IDiscoveryDocumentService DiscoveryDocumentService { get; } = discoveryDocumentService;
+
+        // Internal properties.
+        //well below the 100s HttpClient default timeout
+        internal virtual TimeSpan UserInfoTimeout => TimeSpan.FromSeconds(15);
 
         // Methods.
         public async Task<string> GetClientIdAsync()
@@ -85,6 +95,12 @@ namespace Etherna.Authentication
         {
             var claims = await TryGetClaimAsync(EthernaClaimTypes.Scope).ConfigureAwait(false);
             return new HashSet<string>(claims.Select(c => c.Value)).IsSupersetOf(scopes);
+        }
+
+        public async Task<bool> IsUserTokenRejectedAsync()
+        {
+            await GetUserInfoAsync().ConfigureAwait(false);
+            return isUserTokenRejected;
         }
 
         public async Task<string?> TryGetClientIdAsync()
@@ -143,8 +159,18 @@ namespace Etherna.Authentication
             return claims;
         }
 
-        private async Task<IEnumerable<Claim>> GetUserInfoAsync(string accessToken)
+        private async Task<IEnumerable<Claim>> GetUserInfoAsync()
         {
+            // Machine principals (e.g. from client credentials tokens) have no subject claim, and the
+            // userinfo endpoint requires one: all their claims already live in the token, don't search further.
+            // The subject can appear as "sub" or mapped to the .NET name identifier, depending on the handler.
+            if (!TryGetCurrentUserClaims().Any(c => c.Type is EthernaClaimTypes.UserId or ClaimTypes.NameIdentifier))
+                return [];
+
+            var accessToken = await TryGetUserAccessTokenAsync().ConfigureAwait(false);
+            if (accessToken is null)
+                return [];
+
             if (userInfo is null)
             {
                 // Get discovery document.
@@ -156,10 +182,25 @@ namespace Etherna.Authentication
                     Address = discoveryDoc.UserInfoEndpoint,
                     Token = accessToken
                 };
-                var response = await userInfoHttpClient.GetUserInfoAsync(userInfoRequest).ConfigureAwait(false);
+                using var timeoutSource = new CancellationTokenSource(UserInfoTimeout);
+                UserInfoResponse response;
+                try
+                {
+                    response = await userInfoHttpClient.GetUserInfoAsync(userInfoRequest, timeoutSource.Token).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException e)
+                {
+                    //the timeout is the only failure not answered as an error response
+                    response = ProtocolResponse.FromException<UserInfoResponse>(e);
+                }
 
-                // Cache claims.
-                userInfo = response.Claims;
+                if (response.IsError)
+                    logger.UserInfoRequestFailed(response.ErrorType, response.Error, response.Exception);
+
+                // Cache the outcome. An error response carries no claims, and a failed request not even
+                // the empty set: cache any error as no claims, so the endpoint is asked once.
+                isUserTokenRejected = response.HttpStatusCode == HttpStatusCode.Unauthorized;
+                userInfo = response.IsError ? [] : response.Claims;
             }
 
             return userInfo;
@@ -167,23 +208,11 @@ namespace Etherna.Authentication
 
         private async Task<Claim[]> TryGetClaimAsync(string claimType)
         {
-            var userClaims = TryGetCurrentUserClaims().ToArray();
-            var claims = userClaims.Where(c => c.Type == claimType).ToArray();
-
+            var claims = TryGetCurrentUserClaims().Where(c => c.Type == claimType).ToArray();
             if (claims.Length != 0)
                 return claims;
 
-            // Machine principals (e.g. from client credentials tokens) have no subject claim, and the
-            // userinfo endpoint requires one: all their claims already live in the token, don't search further.
-            // The subject can appear as "sub" or mapped to the .NET name identifier, depending on the handler.
-            if (!userClaims.Any(c => c.Type is EthernaClaimTypes.UserId or ClaimTypes.NameIdentifier))
-                return [];
-
-            var accessToken = await TryGetUserAccessTokenAsync().ConfigureAwait(false);
-            if (accessToken is null)
-                return [];
-
-            var userInfo = await GetUserInfoAsync(accessToken).ConfigureAwait(false);
+            var userInfo = await GetUserInfoAsync().ConfigureAwait(false);
             return userInfo.Where(c => c.Type == claimType).ToArray();
         }
     }

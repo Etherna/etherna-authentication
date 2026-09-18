@@ -20,6 +20,7 @@ namespace Etherna.Authentication.AotCompatibility
     using Etherna.Authentication.Native;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging.Abstractions;
     using System;
     using System.Net.Http;
     using System.Security.Claims;
@@ -177,7 +178,7 @@ namespace Etherna.Authentication.AotCompatibility
         // Test client returning canned user claims, so the probe can drive the claim
         // deserialization paths without a live SSO server.
         private sealed class CannedClaimsClient(params Claim[] claims)
-            : EthernaOpenIdConnectClientBase(new DiscoveryDocumentService(Authority))
+            : EthernaOpenIdConnectClientBase(new DiscoveryDocumentService(Authority), NullLogger.Instance)
         {
             protected override System.Collections.Generic.IEnumerable<Claim> GetCurrentUserClaims() => claims;
             protected override Task<string> GetUserAccessTokenAsync() => throw new InvalidOperationException();
