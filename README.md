@@ -135,9 +135,12 @@ downstream APIs on the user's behalf with Duende's user token management (e.g.
 
 `IEthernaOpenIdConnectClient` is registered by every flow and exposes the authenticated identity as typed
 getters. The `Get*` methods throw if the claim is missing; the `TryGet*` variants return `null` instead.
-A claim the user principal doesn't carry is looked up on the userinfo endpoint of the SSO server: when
-that lookup fails (an error answer, an unreachable server, no answer within 15 seconds) the claim counts
-as missing, and the failure is logged as a warning. `IsUserTokenRejectedAsync` tells when the endpoint
+A claim the user principal doesn't carry is looked up on the userinfo endpoint of the SSO server, once
+for each access token: after a token refresh or a new sign in the claims are read again, for the current
+user. When that lookup fails (an error answer, an unreachable server, no answer within 15 seconds) the
+claim counts as missing, and the failure is logged as a warning; when the failure isn't about the token
+(an unreachable server, no answer, a server error) the endpoint is asked again after a minute.
+`IsUserTokenRejectedAsync` tells when the endpoint
 answered 401, because the access token isn't valid anymore (e.g. the account was deleted after the token
 was issued), so the application can stop early instead of going on with an identity without claims.
 
