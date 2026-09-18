@@ -5,7 +5,7 @@
 [![Etherna.Authentication.ClientCredentials on NuGet](https://img.shields.io/nuget/v/Etherna.Authentication.ClientCredentials?label=Etherna.Authentication.ClientCredentials)](https://www.nuget.org/packages/Etherna.Authentication.ClientCredentials/)
 [![Etherna.Authentication.Native on NuGet](https://img.shields.io/nuget/v/Etherna.Authentication.Native?label=Etherna.Authentication.Native)](https://www.nuget.org/packages/Etherna.Authentication.Native/)
 [![Target frameworks](https://img.shields.io/badge/.NET-9%20%7C%2010-512BD4)](#supported-frameworks)
-[![License: LGPL-3.0](https://img.shields.io/badge/license-LGPL--3.0-blue)](COPYING-LESSER)
+[![License: LGPL-3.0](https://img.shields.io/badge/license-LGPL--3.0-blue)](COPYING.LESSER)
 
 **Etherna Authentication** provides the .NET client libraries to authenticate users and services against
 the [Etherna SSO](https://github.com/Etherna/etherna-sso) server. Built on OpenID Connect and
@@ -326,5 +326,6 @@ For questions or problems please write an email to [info@etherna.io](mailto:info
 
 ![LGPL Logo](https://www.gnu.org/graphics/lgplv3-with-text-154x68.png)
 
-We use the GNU Lesser General Public License v3 (LGPL-3.0) for this project.
+We use the GNU Lesser General Public License v3 or later (SPDX `LGPL-3.0-or-later`) for this project:
+[COPYING.LESSER](COPYING.LESSER) adds the lesser terms to the GNU GPL v3 of [COPYING](COPYING).
 If you require a custom license, you can contact us at [license@etherna.io](mailto:license@etherna.io).

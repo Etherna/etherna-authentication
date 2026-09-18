@@ -33,6 +33,7 @@ Key cross-cutting points:
 - **Public API surface is the product.** These packages are published to NuGet and consumed by the other Etherna repos (e.g. `EthernaSdk` builds its user clients on `Etherna.Authentication.Native`): keep the public surface intentional, and remember both target frameworks must compile.
 - **Native AOT / trim compatible** (`IsAotCompatible=true` everywhere): keep new code AOT-safe — JSON serialization goes through the source-generated `ClaimJsonSerializerContext`, no reflection-based serialization.
 - Assemblies declare `[CLSCompliant(false)]` in `Properties/AssemblyInfo.cs`.
+- **The license is GNU LGPL v3 or later**, stated by the `COPYING` + `COPYING.LESSER` text pair the GitHub detector reads as LGPL-3.0 (it recognises the lesser terms by that exact file name), and declared to the package registries by the `PackageLicenseExpression` of every packable `.csproj` — `LGPL-3.0-or-later`, the SPDX form of the source header wording, mutually exclusive with `PackageLicenseFile`, which no project sets (NuGet accepts a single license file anyway, and a file carries no machine readable identifier). Both texts are packed as package content.
 
 ## Issue tracker
 
