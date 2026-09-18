@@ -15,6 +15,7 @@
 using Duende.AccessTokenManagement.OpenIdConnect;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
@@ -24,8 +25,9 @@ namespace Etherna.Authentication.AspNetCore
 {
     public class EthernaOpenIdConnectClient(
         IDiscoveryDocumentService discoveryDocumentService,
-        IHttpContextAccessor httpContextAccessor)
-        : EthernaOpenIdConnectClientBase(discoveryDocumentService)
+        IHttpContextAccessor httpContextAccessor,
+        ILogger<EthernaOpenIdConnectClient> logger)
+        : EthernaOpenIdConnectClientBase(discoveryDocumentService, logger)
     {
         // Protected methods.
         protected override IEnumerable<Claim> GetCurrentUserClaims()
