@@ -5,7 +5,7 @@
 [![Etherna.Authentication.ClientCredentials on NuGet](https://img.shields.io/nuget/v/Etherna.Authentication.ClientCredentials?label=Etherna.Authentication.ClientCredentials)](https://www.nuget.org/packages/Etherna.Authentication.ClientCredentials/)
 [![Etherna.Authentication.Native on NuGet](https://img.shields.io/nuget/v/Etherna.Authentication.Native?label=Etherna.Authentication.Native)](https://www.nuget.org/packages/Etherna.Authentication.Native/)
 [![Target frameworks](https://img.shields.io/badge/.NET-9%20%7C%2010-512BD4)](#supported-frameworks)
-[![License: LGPL-3.0](https://img.shields.io/badge/license-LGPL--3.0-blue)](COPYING-LESSER)
+[![License: LGPL-3.0](https://img.shields.io/badge/license-LGPL--3.0-blue)](COPYING.LESSER)
 
 **Etherna Authentication** provides the .NET client libraries to authenticate users and services against
 the [Etherna SSO](https://github.com/Etherna/etherna-sso) server. Built on OpenID Connect and
@@ -135,6 +135,14 @@ downstream APIs on the user's behalf with Duende's user token management (e.g.
 
 `IEthernaOpenIdConnectClient` is registered by every flow and exposes the authenticated identity as typed
 getters. The `Get*` methods throw if the claim is missing; the `TryGet*` variants return `null` instead.
+A claim the user principal doesn't carry is looked up on the userinfo endpoint of the SSO server, once
+for each access token: after a token refresh or a new sign in the claims are read again, for the current
+user. When that lookup fails (an error answer, an unreachable server, no answer within 15 seconds) the
+claim counts as missing, and the failure is logged as a warning; when the failure isn't about the token
+(an unreachable server, no answer, a server error) the endpoint is asked again after a minute.
+`IsUserTokenRejectedAsync` tells when the endpoint
+answered 401, because the access token isn't valid anymore (e.g. the account was deleted after the token
+was issued), so the application can stop early instead of going on with an identity without claims.
 
 ```csharp
 using Etherna.Authentication;
@@ -316,7 +324,8 @@ For questions or problems please write an email to [info@etherna.io](mailto:info
 
 ## License
 
-![LGPL Logo](https://www.gnu.org/graphics/lgplv3-with-text-154x68.png)
+![LGPL Logo](https://raw.githubusercontent.com/Etherna/etherna-authentication/main/doc/lgplv3-with-text-154x68.png)
 
-We use the GNU Lesser General Public License v3 (LGPL-3.0) for this project.
+We use the GNU Lesser General Public License v3 or later (SPDX `LGPL-3.0-or-later`) for this project:
+[COPYING.LESSER](COPYING.LESSER) adds the lesser terms to the GNU GPL v3 of [COPYING](COPYING).
 If you require a custom license, you can contact us at [license@etherna.io](mailto:license@etherna.io).
