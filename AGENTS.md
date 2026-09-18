@@ -16,7 +16,7 @@ Every test project targets exactly one source project, named after it: `test/<So
 
 There is nothing to run: `dotnet build` (warnings-as-errors on every target framework) plus `dotnet test` are the verification steps. Because the libraries compile against the lowest target (`net9.0`), do not use APIs introduced only in net10.0 — it would pass on `net10.0` and fail the build on `net9.0`.
 
-Versioning is automatic via **GitVersion** (`GitVersion.MsBuild` in every project, plus SourceLink). CI (`.github/workflows/`): pushes to `dev` and `release/**` build, test, pack and push unstable packages to MyGet; tags `v*.*.*` push stable packages to NuGet.
+Versioning is automatic via **GitVersion** (`GitVersion.MsBuild` in every project, plus SourceLink). CI (`.github/workflows/`): pushes to `dev` and `release/**` build, test, pack and push unstable packages to MyGet; tags `v*.*.*` push stable packages to NuGet. The NuGet push carries no stored key: it authenticates with the trusted publishing of nuget.org, where the deploy job asks GitHub for an OIDC token (`permissions: id-token: write`) and `NuGet/login` exchanges it, right before the push, for an API key that lives one hour. nuget.org issues it by matching the token against a policy of the `etherna` organization owning the packages, registered on the repository owner, the repository and the workflow **file name** — renaming `nuget-stable-deploy.yml`, or moving the push into another workflow, stops the publish until the policy is updated on nuget.org — with the `NUGET_USER` organization secret naming the account that created it. MyGet has no equivalent: the unstable deploy keeps pushing with the `MYGET_APIKEY` key.
 
 ## Architecture
 
