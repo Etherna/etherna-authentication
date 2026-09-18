@@ -25,6 +25,17 @@ namespace Etherna.Authentication
         Task<string> GetUserIdAsync();
         Task<string> GetUsernameAsync();
         Task<bool> HasScopesAsync(params string[] scopes);
+
+        /// <summary>
+        /// Asks the userinfo endpoint whether it still accepts the user access token
+        /// </summary>
+        /// <returns>
+        /// True if the endpoint answered 401: the token isn't valid anymore, e.g. because its user was
+        /// deleted after the issuance. False in any other case, also when the endpoint can't be asked
+        /// (principal without a subject, no access token) or fails in a different way
+        /// </returns>
+        Task<bool> IsUserTokenRejectedAsync();
+
         Task<string?> TryGetClientIdAsync();
         Task<string?> TryGetEtherAddressAsync();
         Task<string[]?> TryGetEtherPrevAddressesAsync();

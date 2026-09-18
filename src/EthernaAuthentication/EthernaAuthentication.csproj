@@ -38,6 +38,14 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.20" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
+  </ItemGroup>
+
   <ItemGroup>
     <None Include="..\..\COPYING" Pack="true" PackagePath="\" />
     <None Include="..\..\COPYING-LESSER" Pack="true" PackagePath="\" />
